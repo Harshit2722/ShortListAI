@@ -3,8 +3,6 @@ const User = require("../models/user.model");
 
 class UserRepository{
 
-
-
 async createUser({name,email,password,company,designation,avatar}){
 
     const user = await User.create({
@@ -20,13 +18,15 @@ async createUser({name,email,password,company,designation,avatar}){
 }
 
 async findUserByEmail(email){
-    const user = await User.findOne({email})
-    return user
+    return await User.findOne({email}).select("-__v -createdAt -updatedAt")
 }
 
 async findUserByEmailWithPassword(email) {
-    return await User.findOne({ email })
-        .select("+password");
+    return await User.findOne({ email }).select("+password -__v -createdAt -updatedAt")
+}
+
+async findUserWithoutPassword(id){
+    return await User.findById(id).select("-__v -createdAt -updatedAt")
 }
 
 async existsByEmail(email){
@@ -36,18 +36,15 @@ async existsByEmail(email){
 }
 
 async findUserById(id){
-    const user = await User.findById(id)
-    return user
+    return await User.findById(id).select("-__v -createdAt -updatedAt")
 }
 
 async updateUser(id,updateData){
-    const user = await User.findByIdAndUpdate(id,updateData,{new:true,runValidators:true,context:'query'})
-    return user
+    return await User.findByIdAndUpdate(id,updateData,{new:true,runValidators:true}).select("-__v -createdAt -updatedAt")
 }
 
 async deleteUser(id){
-    const user = await User.findByIdAndDelete(id)
-    return user
+    return await User.findByIdAndDelete(id).select("-__v -createdAt -updatedAt")
 }
 
 }
