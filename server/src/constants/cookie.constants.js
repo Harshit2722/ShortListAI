@@ -1,3 +1,9 @@
+const BASE_COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/"
+}
 const ACCESS_COOKIE_OPTIONS = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -15,5 +21,6 @@ const REFRESH_COOKIE_OPTIONS = {
 
 module.exports = {
     ACCESS_COOKIE_OPTIONS,
-    REFRESH_COOKIE_OPTIONS
+    REFRESH_COOKIE_OPTIONS,
+    BASE_COOKIE_OPTIONS
 }

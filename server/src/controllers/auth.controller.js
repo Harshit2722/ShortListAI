@@ -1,6 +1,6 @@
 const ApiResponse = require("../utils/ApiResponse");
 const AuthService = require("../services/auth.service");
-const { ACCESS_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS } = require("../constants/cookie.constants");
+const { ACCESS_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS, BASE_COOKIE_OPTIONS } = require("../constants/cookie.constants");
 
 const register = async (req,res)=>{
 
@@ -27,8 +27,19 @@ const getCurrentUser = async (req,res)=>{
     return res.status(200).json(new ApiResponse(200,req.user,"User Info sent successfully"))
 }
 
+const logout = async (req,res)=>{
+
+    await AuthService.logout(req.user._id);
+
+    res.clearCookie("refreshToken",BASE_COOKIE_OPTIONS);
+    res.clearCookie("accessToken",BASE_COOKIE_OPTIONS);
+
+    return res.status(200).json(new ApiResponse(200,null,"User logged out successfully"));
+}
+
 module.exports = {
     register,
     login,
-    getCurrentUser
+    getCurrentUser,
+    logout
 }   

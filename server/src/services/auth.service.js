@@ -43,6 +43,17 @@ const login = async ({email,password})=>{
     }
 }
 
+const logout = async (id)=>{
+
+    const updatedUser = await UserRepository.updateUser(id,{refreshToken: null})
+
+    if(!updatedUser){
+        throw new ApiError(404,"User not found");
+    }
+
+    return;
+}
+
 const generateTokens = function(user){
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
@@ -55,5 +66,6 @@ const generateTokens = function(user){
 
 module.exports = {
     register,
-    login
+    login,
+    logout
 }

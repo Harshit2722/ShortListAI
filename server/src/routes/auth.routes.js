@@ -27,4 +27,12 @@ router.post("/login", validate(loginSchema), authController.login);
  */
 router.get("/me", verifyJWT, authController.getCurrentUser);
 
+
+/**
+ * @route POST /api/v1/auth/logout
+ * @description Logout a user
+ * @access Private  
+ */
+router.post("/logout", verifyJWT, authController.logout);
+
 module.exports = router;
