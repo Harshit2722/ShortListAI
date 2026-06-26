@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema({
         ],
         select: false
     },
+    refreshToken: {
+        type: String,
+        default: null,
+        select: false
+    },
     company: {
         type: String,
         trim: true
