@@ -22,7 +22,13 @@ const login = async (req,res)=>{
     res.status(200).json(new ApiResponse(200,user,"User logged in successfully"))
 }
 
+const getCurrentUser = async (req,res)=>{
+
+    return res.status(200).json(new ApiResponse(200,req.user,"User Info sent successfully"))
+}
+
 module.exports = {
     register,
-    login
+    login,
+    getCurrentUser
 }   
