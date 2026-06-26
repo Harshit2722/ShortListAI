@@ -37,9 +37,22 @@ const logout = async (req,res)=>{
     return res.status(200).json(new ApiResponse(200,null,"User logged out successfully"));
 }
 
+const refreshAccessToken = async (req,res)=>{
+    
+    const refreshToken = req.cookies?.refreshToken;
+
+    const {user,accessToken,refreshToken: newRefreshToken} = await AuthService.refreshAccessToken(refreshToken);
+
+    res.cookie("accessToken",accessToken,ACCESS_COOKIE_OPTIONS)
+    res.cookie("refreshToken",newRefreshToken,REFRESH_COOKIE_OPTIONS)
+
+    return res.status(200).json(new ApiResponse(200,user,"User refreshed access token successfully"));
+}
+
 module.exports = {
     register,
     login,
     getCurrentUser,
-    logout
+    logout,
+    refreshAccessToken
 }   

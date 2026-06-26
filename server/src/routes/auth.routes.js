@@ -35,4 +35,11 @@ router.get("/me", verifyJWT, authController.getCurrentUser);
  */
 router.post("/logout", verifyJWT, authController.logout);
 
+/**
+ * @route POST /api/v1/auth/refresh
+ * @description Refresh access token
+ * @access Public
+ */
+router.post("/refresh", authController.refreshAccessToken);
+
 module.exports = router;

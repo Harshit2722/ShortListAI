@@ -43,6 +43,10 @@ async findUserById(id){
     return await User.findById(id).select("-__v -createdAt -updatedAt")
 }
 
+async findUserByIdWithRefreshToken(id){
+    return await User.findById(id).select("+refreshToken -__v -createdAt -updatedAt")
+}
+
 async updateUser(id,updateData){
     return await User.findByIdAndUpdate(id,updateData,{new:true,runValidators:true}).select("-__v -createdAt -updatedAt")
 }
