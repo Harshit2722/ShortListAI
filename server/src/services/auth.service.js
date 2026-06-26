@@ -34,10 +34,10 @@ const login = async ({email,password})=>{
 
     const {accessToken,refreshToken} = generateTokens(user);
 
-    const finalUser = await UserRepository.findUserWithoutPassword(user._id);
+    const updatedUser = await UserRepository.updateRefreshToken(user._id,refreshToken);
 
     return {
-        user:finalUser,
+        user:updatedUser,
         accessToken:accessToken,
         refreshToken:refreshToken
     }

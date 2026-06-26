@@ -35,6 +35,10 @@ async existsByEmail(email){
     });
 }
 
+async updateRefreshToken(userId,refreshToken){
+    return await User.findByIdAndUpdate(userId,{refreshToken},{new:true,runValidators:true}).select("-__v -createdAt -updatedAt")
+}
+
 async findUserById(id){
     return await User.findById(id).select("-__v -createdAt -updatedAt")
 }
