@@ -1,8 +1,7 @@
-const AsyncHandler = require("../utils/AsyncHandler");
 const ApiResponse = require("../utils/ApiResponse");
 const AuthService = require("../services/auth.service")
 
-const register = AsyncHandler(async (req,res)=>{
+const register = async (req,res)=>{
 
     const {user,accessToken,refreshToken} = await AuthService.register(req.body);
 
@@ -10,9 +9,9 @@ const register = AsyncHandler(async (req,res)=>{
     res.cookie("refreshToken",refreshToken,{httpOnly:true,secure:true,maxAge:60*60*24*7*1000})
 
     res.status(201).json(new ApiResponse(201, user,"User registered successfully"))
-})
+}
 
-const login = AsyncHandler(async (req,res)=>{
+const login = async (req,res)=>{
 
     const {user,accessToken,refreshToken} = await AuthService.login(req.body);
 
@@ -20,7 +19,7 @@ const login = AsyncHandler(async (req,res)=>{
     res.cookie("refreshToken",refreshToken,{httpOnly:true,secure: process.env.NODE_ENV === "production",sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",maxAge:60*60*24*7*1000})
 
     res.status(200).json(new ApiResponse(200,user,"User logged in successfully"))
-})
+}
 
 module.exports = {
     register,
