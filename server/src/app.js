@@ -17,11 +17,6 @@ app.use(cors({
     credentials: true
 }))
 
-app.use((req,res,next)=>{
-    console.log(`${req.method} ${req.url}`)
-    return next();
-})
-
 app.use(morgan("dev"));
 
 app.use(express.json());
