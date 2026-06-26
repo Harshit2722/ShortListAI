@@ -74,6 +74,4 @@ userSchema.methods.generateRefreshToken = function(){
     return jwt.sign(payload,process.env.JWT_REFRESH_SECRET,{expiresIn:process.env.JWT_REFRESH_EXPIRY})
 }
 
-userSchema.index({email: 1})
-
 module.exports = mongoose.model("User",userSchema)
