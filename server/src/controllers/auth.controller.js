@@ -1,6 +1,6 @@
 const AsyncHandler = require("../utils/AsyncHandler");
 const ApiResponse = require("../utils/ApiResponse");
-const AuthService = require("../services/user.service")
+const AuthService = require("../services/auth.service")
 
 const register = AsyncHandler(async (req,res)=>{
 
