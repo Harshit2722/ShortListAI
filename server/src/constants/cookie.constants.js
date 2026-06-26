@@ -5,17 +5,13 @@ const BASE_COOKIE_OPTIONS = {
     path: "/"
 }
 const ACCESS_COOKIE_OPTIONS = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    ...BASE_COOKIE_OPTIONS,
     maxAge: 15 * 60 * 1000
 }
 
 
 const REFRESH_COOKIE_OPTIONS = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    ...BASE_COOKIE_OPTIONS,
     maxAge: 7 * 24 * 60 * 60 * 1000
 }
 

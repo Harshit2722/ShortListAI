@@ -1,5 +1,6 @@
 const UserRepository = require("../repositories/user.repository");
 const ApiError = require("../utils/ApiError");
+const jwt = require("jsonwebtoken")
 
 const register = async ({name,email,password,company,designation,avatar})=>{
 
@@ -11,6 +12,8 @@ const register = async ({name,email,password,company,designation,avatar})=>{
     const user = await UserRepository.createUser({name,email,password,company,designation,avatar});
 
     const {accessToken,refreshToken} = generateTokens(user);
+
+    await UserRepository.updateRefreshToken(user._id,refreshToken);
 
     const finalUser = await UserRepository.findUserWithoutPassword(user._id);
 
