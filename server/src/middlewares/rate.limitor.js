@@ -1,4 +1,4 @@
-const rateLimit = require("express-rate-limit");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 
 // General Api Rate Limiter
 const apiLimiter = rateLimit({
@@ -22,12 +22,12 @@ const publicLimiter = rateLimit({
     max: 5,
 
     keyGenerator: (req) => {
-        const email =
-            typeof req.body?.email === "string"
+    const email =
+        typeof req.body?.email === "string"
             ? req.body.email.trim().toLowerCase()
             : "unknown";
 
-        return `${req.ip}:${email}`;
+    return `${ipKeyGenerator(req.ip)}:${email}`;
     },
 
     standardHeaders: true,

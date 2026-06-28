@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 
 const errorMiddleware = require("./middlewares/error.middleware")
-const {apiLimitor} = require("./middlewares/rate.limitor")
+const {apiLimiter} = require("./middlewares/rate.limitor")
 const authRoutes = require("./routes/auth.routes")
 
 const app = express();
@@ -25,7 +25,7 @@ app.use(express.urlencoded({extended: true}));
 
 app.use(cookieParser());
 
-app.use("/api/v1",apiLimitor)
+app.use("/api/v1",apiLimiter)
 
 app.use("/api/v1/auth",authRoutes);
 
