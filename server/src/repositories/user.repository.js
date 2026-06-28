@@ -36,7 +36,7 @@ async existsByEmail(email){
 }
 
 async updateRefreshToken(userId,refreshToken){
-    return await User.findByIdAndUpdate(userId,{refreshToken},{new:true,runValidators:true}).select("-__v -createdAt -updatedAt")
+    return await User.findByIdAndUpdate(userId,{refreshToken},{returnDocument: 'after',runValidators:true}).select("-__v -createdAt -updatedAt")
 }
 
 async findUserById(id){
@@ -48,7 +48,7 @@ async findUserByIdWithRefreshToken(id){
 }
 
 async updateUser(id,updateData){
-    return await User.findByIdAndUpdate(id,updateData,{new:true,runValidators:true}).select("-__v -createdAt -updatedAt")
+    return await User.findByIdAndUpdate(id,updateData,{returnDocument: 'after',runValidators:true}).select("-__v -createdAt -updatedAt")
 }
 
 async deleteUser(id){
