@@ -78,7 +78,7 @@ const refreshAccessToken = async (refreshToken)=>{
     const user = await UserRepository.findUserByIdWithRefreshToken(decoded.id);
 
     if(!user){
-        throw new ApiError(401,"User not found")
+        throw new ApiError(404,"User not found")
     }
     
     if(user.refreshToken !== refreshToken){
