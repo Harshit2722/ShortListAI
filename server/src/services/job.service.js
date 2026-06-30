@@ -38,12 +38,15 @@ const updateJob = async (jobId,jobData,recruiterId) => {
         }
     }
 
-    if(jobData.applicationDeadline && jobData.applicationDeadline<= new Date()){
-        throw new ApiError(400,"Application deadline must be in the future")
+    const finalEmploymentType = jobData.employmentType || job.employmentType;
+    const finalDuration = jobData.duration!==undefined ? jobData.duration : job.duration;
+
+    if(finalEmploymentType !== "Full-Time" && !finalDuration){
+        throw new ApiError(400,"Duration is required")
     }
 
-    if(jobData.employmentType && jobData.employmentType!=="Full-Time" && !jobData.duration){
-        throw new ApiError(400,"Duration is required")
+    if(jobData.applicationDeadline && jobData.applicationDeadline<= new Date()){
+        throw new ApiError(400,"Application deadline must be in the future")
     }
 
     const updatedJob = await JobRepository.updateJob(jobId,jobData);
@@ -51,7 +54,6 @@ const updateJob = async (jobId,jobData,recruiterId) => {
     if(!updatedJob){
         throw new ApiError(500,"Failed to update job")
     }
-
 
     return updatedJob
 }
