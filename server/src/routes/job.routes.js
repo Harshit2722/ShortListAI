@@ -4,7 +4,7 @@ const router = express.Router();
 const jobController = require("../controllers/job.controller");
 const verifyJWT = require("../middlewares/auth.middleware");
 const authorize = require("../middlewares/authorize.middleware");
-const {createJobSchema,updateJobSchema} = require("../validations/job.validation");
+const {createJobSchema,updateJobSchema} = require("../validators/job.validator");
 const validate = require("../middlewares/validation.middleware");
 const {authenticatedLimiter} = require("../middlewares/rate.limitor");
 

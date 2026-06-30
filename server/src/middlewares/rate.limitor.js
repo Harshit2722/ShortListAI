@@ -1,21 +1,5 @@
 const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 
-// General Api Rate Limiter
-const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-
-    standardHeaders: true,
-    legacyHeaders: false,
-
-    handler: (req, res) => {
-        return res.status(429).json({
-            success: false,
-            message: "Too many requests. Please try again later."
-        });
-    }
-});
-
 // Public Routes Rate Limiter (register,login)
 const publicLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -61,8 +45,28 @@ const refreshLimiter = rateLimit({
     }
 })
 
+// Authenticated Users Rate Limiter (jobs,applications)
+const authenticatedLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 300,
+
+    keyGenerator: (req) => {
+        return req.user._id.toString();
+    },
+
+    standardHeaders: true,
+    legacyHeaders: false,
+
+    handler: (req, res) => {
+        return res.status(429).json({
+            success: false,
+            message: "Too many requests. Please try again later."
+        });
+    }
+});
+
 module.exports = {
-    apiLimiter,
     publicLimiter,
-    refreshLimiter
+    refreshLimiter,
+    authenticatedLimiter
 }
