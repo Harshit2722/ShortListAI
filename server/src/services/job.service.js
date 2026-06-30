@@ -39,10 +39,16 @@ const updateJob = async (jobId,jobData,recruiterId) => {
     }
 
     const finalEmploymentType = jobData.employmentType || job.employmentType;
-    const finalDuration = jobData.duration!==undefined ? jobData.duration : job.duration;
+    const finalDuration = jobData.duration !== undefined ? jobData.duration : job.duration;
 
-    if(finalEmploymentType !== "Full-Time" && !finalDuration){
+    const hasDuration = finalDuration && finalDuration.value !== undefined && finalDuration.unit !== undefined;
+
+    if(finalEmploymentType !== "Full-Time" && !hasDuration){
         throw new ApiError(400,"Duration is required")
+    }
+
+    if(finalEmploymentType==="Full-Time"){
+        jobData.duration = null;
     }
 
     if(jobData.applicationDeadline && jobData.applicationDeadline<= new Date()){
