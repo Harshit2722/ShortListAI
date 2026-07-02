@@ -87,6 +87,8 @@ const deleteResume = async (resumeId,recruiterId,jobId) => {
     
     await resume.deleteOne();
 
+    return resume;
+
 }
 
 const verifyRecruiterOwnsJob = async (jobId, recruiterId) => {
@@ -97,7 +99,7 @@ const verifyRecruiterOwnsJob = async (jobId, recruiterId) => {
     }
 
     if (job.createdBy.toString() !== recruiterId.toString()) {
-        throw new ApiError(403, "You dont own this job");
+        throw new ApiError(403,"You are not authorized to access this job");
     }
 
     return job;
