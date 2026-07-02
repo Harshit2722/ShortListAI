@@ -1,4 +1,5 @@
 const { PDFParse } = require("pdf-parse");
+const ApiError = require("./ApiError");
 
 const extractTextFromPDF = async (buffer) => {
     try {
@@ -9,7 +10,7 @@ const extractTextFromPDF = async (buffer) => {
         return result.text.trim();
     } catch (error) {
         console.error("PDF parsing error:", error.message);
-        throw new Error("Failed to extract text from PDF");
+        throw new ApiError(500, "Failed to extract text from PDF");
     }
 };
 

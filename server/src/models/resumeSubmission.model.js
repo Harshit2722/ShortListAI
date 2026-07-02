@@ -25,16 +25,20 @@ const resumeSchema = new mongoose.Schema({
     resume: {
         publicId: {
             type: String,
-            required: true
+            required: [true,"Public ID is required"]
         },
         url: {
             type: String,
-            required: true
+            required: [true,"URL is required"]
         }
+    },
+    resumeText: {
+        type: String,
+        required: [true,"Resume text is required"]
     },
     fileHash: {
         type: String,
-        required: true
+        required: [true,"File hash is required"]
     },
     status: {
         type: String,
