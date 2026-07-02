@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const jobController = require("../controllers/job.controller");
+const resumeController = require("../controllers/resume.controller");
+const upload = require("../middlewares/upload.middleware")
 const verifyJWT = require("../middlewares/auth.middleware");
 const authorize = require("../middlewares/authorize.middleware");
 const {createJobSchema,updateJobSchema} = require("../validators/job.validator");
@@ -9,15 +11,15 @@ const validate = require("../middlewares/validation.middleware");
 const {authenticatedLimiter} = require("../middlewares/rate.limitor");
 
 router.use(verifyJWT);
-router.use(authenticatedLimiter);
 router.use(authorize("recruiter"));
 
+// Job Routes
 /**
  * @route POST api/v1/jobs/ 
  * @desc Create a new job
  * @access Private (Recruiter)
  */
-router.post("/",validate(createJobSchema),jobController.createJob);
+router.post("/",authenticatedLimiter,validate(createJobSchema),jobController.createJob);
 
 /**
  * @route GET api/v1/jobs/ 
@@ -33,7 +35,7 @@ router.get("/",jobController.getAllJobsOfARecruiter);
  * @access Private (Recruiter)
  */
 
-router.patch("/:jobId",validate(updateJobSchema),jobController.updateJob);
+router.patch("/:jobId",authenticatedLimiter,validate(updateJobSchema),jobController.updateJob);
 
 /**
  * @route GET api/v1/jobs/:jobId
@@ -49,6 +51,36 @@ router.get("/:jobId",jobController.getJobById);
  * @access Private (Recruiter)
  */
 
-router.delete("/:jobId",jobController.deleteJob);
+router.delete("/:jobId",authenticatedLimiter,jobController.deleteJob);
+
+
+//Resume Routes
+/**
+ * @route POST /api/v1/jobs/:jobId/resumes
+ * @desc Upload resume for a job
+ * @access Private
+ */
+router.post("/:jobId/resumes",authenticatedLimiter,upload.single("resume"),resumeController.createResume);
+
+/**
+ * @route GET /api/v1/jobs/:jobId/resumes/:resumeId
+ * @desc Get resume by ID
+ * @access Private
+ */
+router.get("/:jobId/resumes/:resumeId",resumeController.getResumeById);
+
+/**
+ * @route GET /api/v1/jobs/:jobId/resumes
+ * @desc Get all resumes for a job
+ * @access Private
+ */
+router.get("/:jobId/resumes",resumeController.getResumesByJob);
+
+/**
+ * @route DELETE /api/v1/jobs/:jobId/resumes/:resumeId
+ * @desc Delete resume
+ * @access Private
+ */
+router.delete("/:jobId/resumes/:resumeId",authenticatedLimiter,resumeController.deleteResume);
 
 module.exports = router;
