@@ -5,13 +5,11 @@ const jobController = require("../controllers/job.controller");
 const resumeController = require("../controllers/resume.controller");
 const upload = require("../middlewares/upload.middleware")
 const verifyJWT = require("../middlewares/auth.middleware");
-const authorize = require("../middlewares/authorize.middleware");
 const {createJobSchema,updateJobSchema} = require("../validators/job.validator");
 const validate = require("../middlewares/validation.middleware");
 const {authenticatedLimiter} = require("../middlewares/rate.limitor");
 
 router.use(verifyJWT);
-router.use(authorize("recruiter"));
 
 // Job Routes
 /**

@@ -20,11 +20,6 @@ const userSchema = new mongoose.Schema({
         required: [true, "Password is required"],
         select: false
     },
-    role: {
-        type: String,
-        enum: ["recruiter","admin"],
-        default: "recruiter"
-    },
     refreshToken: {
         type: String,
         default: null,
