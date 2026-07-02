@@ -1,28 +1,30 @@
 # Shortlist AI
 
-Shortlist AI is an AI-powered recruitment platform designed to streamline the hiring process for recruiters and candidates. The platform enables recruiters to manage job postings, receive applications, analyze resumes using AI, and automate candidate shortlisting while providing candidates with a seamless application experience.
+Shortlist AI is an AI-powered recruitment assistant that helps recruiters organize, analyze, and shortlist candidates more efficiently. Recruiters can create job postings, upload and manage resumes, and leverage AI to automate resume analysis and candidate ranking.
 
 ---
 
 ## Features
 
-### Authentication & Authorization
+### Authentication
 
 - User Registration
 - User Login
 - JWT Authentication
 - Refresh Token Authentication
-- Role-Based Access Control (Recruiter & Candidate)
 - Protected Routes
 - Secure HTTP-only Cookies
 - Password Hashing
 
 ### Security
 
-- Rate Limiting
+- JWT Authentication
+- Request Rate Limiting
 - Input Validation using Zod
 - Mongoose Schema Validation
-- Ownership Verification
+- Recruiter Ownership Verification
+- SHA-256 Duplicate Detection
+- Secure File Uploads
 - Centralized Error Handling
 
 ### Job Management
@@ -33,7 +35,16 @@ Shortlist AI is an AI-powered recruitment platform designed to streamline the hi
 - Get Job by ID
 - Get All Jobs of a Recruiter
 - Business Rule Validation
-- Recruiter-only Access
+
+### Resume Management
+
+- Upload resumes for specific jobs
+- Retrieve resumes by job
+- Retrieve resume by ID
+- Delete resumes
+- Secure resume storage using Cloudinary
+- SHA-256 file hashing for duplicate detection
+- Resume-to-job association
 
 ---
 
@@ -59,7 +70,15 @@ Shortlist AI is an AI-powered recruitment platform designed to streamline the hi
 
 - Zod
 
-### Other
+### File Storage
+
+- Cloudinary
+
+### File Upload
+
+- Multer
+
+### Security
 
 - Helmet
 - Cookie Parser
@@ -123,6 +142,14 @@ src
 
 ---
 
+## Prerequisites
+
+- Node.js 20+
+- MongoDB Atlas or Local MongoDB
+- Cloudinary Account
+
+---
+
 ## Installation
 
 ### 1. Clone the Repository
@@ -162,6 +189,12 @@ REFRESH_TOKEN_EXPIRY=
 CLIENT_URL=
 
 NODE_ENV=
+
+CLOUDINARY_CLOUD_NAME=
+
+CLOUDINARY_API_KEY=
+
+CLOUDINARY_API_SECRET=
 ```
 
 ### 5. Start the Development Server
@@ -193,6 +226,15 @@ npm run dev
 | PATCH | `/api/v1/jobs/:jobId` |
 | DELETE | `/api/v1/jobs/:jobId` |
 
+### Resume Management
+
+| Method | Endpoint |
+|---------|----------|
+| POST | `/api/v1/jobs/:jobId/resumes` |
+| GET | `/api/v1/jobs/:jobId/resumes` |
+| GET | `/api/v1/jobs/:jobId/resumes/:resumeId` |
+| DELETE | `/api/v1/jobs/:jobId/resumes/:resumeId` |
+
 ---
 
 
@@ -204,5 +246,6 @@ npm run dev
 - Separation of Concerns
 - RESTful API Design
 - Clean Code Practices
+- Modular Backend Architecture
 
 
