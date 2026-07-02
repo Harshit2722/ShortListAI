@@ -1,0 +1,113 @@
+const JobRepository = require("../repositories/job.repository");
+const ResumeSubmissionRepository = require("../repositories/resume.repository");
+const ApiError = require("../utils/ApiError");
+const crypto = require("crypto");
+const {uploadResume} = require("../utils/cloudinary")
+
+const createResume = async (jobId,recruiterId,resumeFile) => {
+
+    if(!resumeFile){
+        throw new ApiError(400,"Resume File not uploaded")
+    }
+
+    const job = await verifyRecruiterOwnsJob(jobId,recruiterId);
+
+    const applicationDeadline = job.applicationDeadline;
+
+    if(applicationDeadline.getTime()< Date.now()){
+        throw new ApiError(400,"Application deadline has passed. Cannot upload resume now");
+    }
+
+    const buffer = resumeFile.buffer;
+    const hash = crypto.createHash("sha256").update(buffer).digest("hex")
+
+    const existingResume = await ResumeSubmissionRepository.findResumeWithHash(jobId,hash);
+
+    if(existingResume){
+        throw new ApiError(409,"This resume is already uploaded for this job")
+    }
+
+    const {url,publicId} = await uploadResume(buffer);
+
+
+    const resumeData = {
+        job: jobId,
+        resume: {
+            url,
+            publicId
+        },
+        fileHash:hash
+    }
+
+    const resume = await ResumeSubmissionRepository.createResume(resumeData);
+
+    return resume;
+    
+}
+
+const getResumeById = async (resumeId,recruiterId,jobId) => {
+
+    await verifyRecruiterOwnsJob(jobId,recruiterId);
+
+    const resume = await ResumeSubmissionRepository.findResumeById(resumeId);
+
+    if(!resume){
+        throw new ApiError(404,"Resume not found")
+    }
+
+    if(resume.job.toString()!==jobId.toString()){
+        throw new ApiError(404,"Resume not found")
+    }
+
+    return resume;
+}
+
+const getResumesByJob = async (jobId,recruiterId) => {
+
+    await verifyRecruiterOwnsJob(jobId,recruiterId);
+
+    const resumes = await ResumeSubmissionRepository.getResumesByJob(jobId);
+
+    return resumes;
+}
+
+const deleteResume = async (resumeId,recruiterId,jobId) => {
+
+    await verifyRecruiterOwnsJob(jobId,recruiterId);
+
+    const resume = await ResumeSubmissionRepository.findResumeById(resumeId);
+
+    if(!resume){
+        throw new ApiError(404,"Resume not found")
+    }
+
+    if(resume.job.toString()!==jobId.toString()){
+        throw new ApiError(404,"Resume not found")
+    }
+    
+    await resume.deleteOne();
+
+    return resume;
+
+}
+
+const verifyRecruiterOwnsJob = async (jobId, recruiterId) => {
+    const job = await JobRepository.findJobById(jobId);
+
+    if (!job) {
+        throw new ApiError(404, "Job not found");
+    }
+
+    if (job.createdBy.toString() !== recruiterId.toString()) {
+        throw new ApiError(403,"You are not authorized to access this job");
+    }
+
+    return job;
+};
+
+module.exports = {
+    createResume,
+    getResumesByJob,
+    getResumeById,
+    deleteResume
+}
