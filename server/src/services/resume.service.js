@@ -3,6 +3,7 @@ const ResumeSubmissionRepository = require("../repositories/resume.repository");
 const ApiError = require("../utils/ApiError");
 const crypto = require("crypto");
 const {uploadResume} = require("../utils/cloudinary")
+const {extractTextFromPDF} = require("../utils/pdfParser")
 
 const createResume = async (jobId,recruiterId,resumeFile) => {
 
@@ -26,9 +27,10 @@ const createResume = async (jobId,recruiterId,resumeFile) => {
     if(existingResume){
         throw new ApiError(409,"This resume is already uploaded for this job")
     }
+    
+    const resumeText = await extractTextFromPDF(buffer);
 
     const {url,publicId} = await uploadResume(buffer);
-
 
     const resumeData = {
         job: jobId,
@@ -36,6 +38,7 @@ const createResume = async (jobId,recruiterId,resumeFile) => {
             url,
             publicId
         },
+        resumeText,
         fileHash:hash
     }
 
