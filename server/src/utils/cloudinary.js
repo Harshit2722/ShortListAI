@@ -24,6 +24,13 @@ const uploadResume = (buffer) => {
     });
 };
 
+const deleteResume = async (publicId) => {
+    await cloudinary.uploader.destroy(publicId, {
+        resource_type: "raw"
+    });
+};
+
 module.exports = {
-    uploadResume
+    uploadResume,
+    deleteResume
 };
