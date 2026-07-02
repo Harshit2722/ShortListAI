@@ -2,7 +2,7 @@ const JobRepository = require("../repositories/job.repository");
 const ResumeSubmissionRepository = require("../repositories/resume.repository");
 const ApiError = require("../utils/ApiError");
 const crypto = require("crypto");
-const {uploadResume} = require("../utils/cloudinary")
+const {uploadResume,deleteResume} = require("../utils/cloudinary")
 const {extractTextFromPDF} = require("../utils/pdfParser")
 
 const createResume = async (jobId,recruiterId,resumeFile) => {
@@ -42,10 +42,14 @@ const createResume = async (jobId,recruiterId,resumeFile) => {
         fileHash:hash
     }
 
-    const resume = await ResumeSubmissionRepository.createResume(resumeData);
-
-    return resume;
-    
+    try{
+        const resume = await ResumeSubmissionRepository.createResume(resumeData);
+        return resume;
+    }
+    catch(err){
+        await deleteResume(publicId);
+        throw new ApiError(500,"Failed to create resume");
+    }
 }
 
 const getResumeById = async (resumeId,recruiterId,jobId) => {
@@ -87,6 +91,8 @@ const deleteResume = async (resumeId,recruiterId,jobId) => {
     if(resume.job.toString()!==jobId.toString()){
         throw new ApiError(404,"Resume not found")
     }
+    
+    await deleteResume(resume.resume.publicId);
     
     await resume.deleteOne();
 
