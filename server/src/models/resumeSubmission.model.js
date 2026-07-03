@@ -20,6 +20,24 @@ const resumeSchema = new mongoose.Schema({
         phone: {
             type: String,
             trim: true
+        },
+        skills: {
+            type: [{
+                type: String,
+                trim: true
+            }]
+        },
+        education: {
+            type: [{
+                type: String,
+                trim: true
+            }]
+        },
+        experience: {
+            type: [{
+                type: String,
+                trim: true
+            }]
         }
     },
     resume: {
@@ -44,6 +62,40 @@ const resumeSchema = new mongoose.Schema({
         type: String,
         enum: ["Pending","Processing","Failed","Completed"],
         default: "Pending"
+    },
+    analysis: {
+        score: {
+            type: Number,
+            min: [0,"Score cannot be negative"],
+            max: [10,"Maximum score recruiter can give is 10"]
+        },
+        recommendation: {
+            type: String,
+            enum: ["Strong Match","Good Match","Average Match","Poor Match"]
+        },
+        summary: {
+            type: String,
+            trim: true
+        },
+        strengths: {
+            type: [{
+                type: String,
+                trim: true
+            }]
+        },
+        weaknesses: {
+            type: [{
+                type: String,
+                trim: true
+            }]
+        },
+        missingSkills: {
+            type: [{
+                type: String,
+                trim: true
+            }],
+            default: []
+        }
     }
 },{timestamps:true})
 
