@@ -6,6 +6,10 @@ class ResumeSubmissionRepository{
         return await ResumeSubmission.create(resumeData)
     }
 
+    async updateResume(resumeId,updateData){
+        return await ResumeSubmission.findByIdAndUpdate(resumeId,updateData,{returnDocument:"after",runValidators:true}).select("-__v");
+    }
+
     async findResumeWithHash(jobId,hash){
         return await ResumeSubmission.findOne({
             job:jobId,
