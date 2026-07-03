@@ -23,7 +23,7 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
             ${jobDescription}
 
             Required Skills:
-            ${requiredSkills.join(", ")}
+            ${(Array.isArray(requiredSkills) ? requiredSkills : []).join(", ")}
 
             Resume:
             ${resumeText}
