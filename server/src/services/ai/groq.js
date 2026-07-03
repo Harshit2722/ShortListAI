@@ -13,7 +13,7 @@ const generateCompletion = async (prompt) => {
             temperature: 0.2,
             messages: [
                 {
-                    role: "User",
+                    role: "user",
                     content: prompt
                 }
             ]
@@ -22,6 +22,7 @@ const generateCompletion = async (prompt) => {
         return completion.choices[0].message.content;
     }
     catch(error){
+        console.error(error);
         throw new ApiError(500,"Failed to generate AI response");
     }
 }
