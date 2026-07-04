@@ -9,9 +9,13 @@ const resumeAnalysisSchema = z.object({
         skills: z.array(z.string()),
         education: z.array(z.string()),
         experience: z.array(z.string())
-    }),
+    }).strict(),
     analysis: z.object({
-        score: z.number().min(0).max(10),
+        skillsScore: z.number().int().min(0).max(10),
+        experienceScore: z.number().int().min(0).max(10),
+        educationScore: z.number().int().min(0).max(10),
+        resumeScore: z.number().int().min(0).max(10),
+        projectsScore: z.number().int().min(0).max(10),
 
         recommendation: z.enum(["Strong Match","Good Match","Average Match","Poor Match"]),
 
@@ -20,8 +24,8 @@ const resumeAnalysisSchema = z.object({
         strengths: z.array(z.string()),
         weaknesses: z.array(z.string()),
         missingSkills: z.array(z.string())
-    })
-})
+    }).strict()
+}).strict()
 
 const validateResponse = (response) => {
 
@@ -31,7 +35,7 @@ const validateResponse = (response) => {
         return resumeAnalysisSchema.parse(parsedResponse);
     }
     catch(error){
-        console.log(error.message);
+        console.error("AI Response Validation Error:", error);
         throw new ApiError(500,"Failed to validate AI response")
     }
 }

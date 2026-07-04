@@ -69,7 +69,7 @@ const resumeSchema = new mongoose.Schema({
             min: [0,"Overall score cannot be negative"],
             max: [10,"Maximum value of overall score can be 10"]
         },
-        skillScore: {
+        skillsScore: {
             type: Number,
             min: [0,"Skill score cannot be negative"],
             max: [10,"Maximum skill score AI can give is 10"]
