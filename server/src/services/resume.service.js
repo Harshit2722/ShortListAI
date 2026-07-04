@@ -135,8 +135,29 @@ const analyzeResume = async (resumeId,jobId,recruiterId) => {
             resumeText: resume.resumeText,
             jobDescription: job.description,
             jobTitle: job.title,
-            requiredSkills: job.requiredSkills
+            requiredSkills: job.requiredSkills,
+            requiredExperience: job.experience
         })
+
+        const overallScore = (
+            analysis.analysis.skillsScore * 0.40 +
+            analysis.analysis.experienceScore * 0.30 +
+            analysis.analysis.projectsScore * 0.15 +
+            analysis.analysis.educationScore * 0.10 +
+            analysis.analysis.resumeScore * 0.05
+        ).toFixed(1);
+
+        analysis.analysis.overallScore = overallScore;
+
+        if (overallScore >= 9) {
+            analysis.analysis.recommendation = "Strong Match";
+        } else if (overallScore >= 7) {
+            analysis.analysis.recommendation = "Good Match";
+        } else if (overallScore >= 5) {
+            analysis.analysis.recommendation = "Average Match";
+        } else {
+            analysis.analysis.recommendation = "Poor Match";
+        }
 
         const updatedResume = await ResumeSubmissionRepository.updateResume(resumeId,{
             candidate: analysis.candidate,
@@ -150,7 +171,7 @@ const analyzeResume = async (resumeId,jobId,recruiterId) => {
         await ResumeSubmissionRepository.updateResume(resumeId,{
             status: "Failed"
         })
-        console.log(error);
+        console.error(error);
         throw new ApiError(500,"Failed to analyze resume");
     }
 

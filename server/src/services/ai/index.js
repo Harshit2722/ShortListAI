@@ -2,9 +2,9 @@ const {buildResumeAnalysisPrompt} = require("./prompt");
 const {generateCompletion} = require("./groq");
 const {validateResponse} = require("./validator");
 
-const analyzeResume = async ({resumeText,jobDescription,jobTitle,requiredSkills}) => {
+const analyzeResume = async ({resumeText,jobDescription,jobTitle,requiredSkills,requiredExperience}) => {
 
-    const prompt = buildResumeAnalysisPrompt({resumeText,jobDescription,jobTitle,requiredSkills});
+    const prompt = buildResumeAnalysisPrompt({resumeText,jobDescription,jobTitle,requiredSkills,requiredExperience});
 
     const response = await generateCompletion(prompt);
 
