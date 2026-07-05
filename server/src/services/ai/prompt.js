@@ -1,5 +1,5 @@
 
-const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredSkills,requiredExperience}) => {
+const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredSkills,requiredExperience,seniority}) => {
 
     const prompt = `
         You are an experienced technical recruiter responsible for evaluating software engineering candidates.
@@ -36,6 +36,30 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
         0-2 : Poor match
 
         ========================
+            JOB SENIORITY
+        ========================
+
+        Expected Seniority Level:
+        ${seniority}
+
+        Evaluate the candidate according to the expectations of this seniority level.
+
+        Intern
+        - Focus primarily on technical skills, projects, internships, certifications, and learning potential.
+
+        Junior
+        - Professional experience is beneficial but strong personal projects, internships, and technical ability may compensate.
+
+        Mid-Level
+        - Expect relevant professional experience together with solid technical skills and the ability to work independently.
+
+        Senior
+        - Expect strong professional experience, system design knowledge, ownership, problem-solving ability, mentoring, and technical leadership.
+
+        Staff / Principal
+        - Expect significant technical leadership, large-scale system design, cross-team collaboration, architecture ownership, and extensive production experience.
+
+        ========================
         CANDIDATE EXTRACTION RULES
         ========================
 
@@ -59,6 +83,9 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
 
         Required Experience:
         ${requiredExperience} years
+
+        Expected Seniority:
+        ${seniority}
 
         1. If required experience is 0 years:
             - Do NOT penalize candidates for having no professional experience.
@@ -94,7 +121,7 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
         3. Do NOT heavily penalize candidates from lesser-known colleges.
         4. Relevant certifications should positively influence the education score.
         5. Extract the complete education details exactly as mentioned in the resume, including the degree, institution, location, dates or duration, and any other relevant information. Do not omit or summarize any education entries.
-        
+
         ========================
         RESUME PRESENTATION RULES
         ========================
