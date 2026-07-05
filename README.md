@@ -1,89 +1,70 @@
-# Shortlist AI
+# Shortlist AI 
+> AI-powered Recruitment Assistant backend built with Node.js, Express.js, MongoDB, and Groq LLM.
 
-Shortlist AI is an AI-powered recruitment assistant that helps recruiters organize, analyze, and shortlist candidates more efficiently. Recruiters can create job postings, upload and manage resumes, and leverage AI to automate resume analysis and candidate ranking.
 
----
-
-## Features
-
-### Authentication
-
-- User Registration
-- User Login
-- JWT Authentication
-- Refresh Token Authentication
-- Protected Routes
-- Secure HTTP-only Cookies
-- Password Hashing
-
-### Security
-
-- JWT Authentication
-- Request Rate Limiting
-- Input Validation using Zod
-- Mongoose Schema Validation
-- Recruiter Ownership Verification
-- SHA-256 Duplicate Detection
-- Secure File Uploads
-- Centralized Error Handling
-
-### Job Management
-
-- Create Job
-- Update Job
-- Delete Job
-- Get Job by ID
-- Get All Jobs of a Recruiter
-- Business Rule Validation
-
-### Resume Management
-
-- Upload resumes for specific jobs
-- Retrieve resumes by job
-- Retrieve resume by ID
-- Delete resumes
-- Secure resume storage using Cloudinary
-- SHA-256 file hashing for duplicate detection
-- Resume-to-job association
+Shortlist AI is an AI-powered recruitment assistant that helps recruiters organize, analyze, and shortlist candidates more efficiently. Recruiters can create job postings, upload and manage resumes, and leverage AI to automate resume analysis.
 
 ---
 
+## Key Features
+
+- JWT-based authentication with secure HTTP-only cookies
+- Complete job and resume management APIs
+- AI-powered resume analysis using Groq LLM
+- Automatic candidate information extraction
+- Dynamic candidate scoring based on job seniority
+- Backend-generated hiring recommendations
+- SHA-256 duplicate resume detection
+- PDF parsing and Cloudinary integration
+- Strict AI response validation using Zod
+- Layered architecture with Repository and Service patterns
+
+---
+
+## AI Resume Analysis Workflow
+
+```
+Resume Upload
+      │
+      ▼
+Extract PDF Text
+      │
+      ▼
+Generate SHA-256 Hash
+      │
+      ▼
+Store Resume
+      │
+      ▼
+LLM Analysis (Groq)
+      │
+      ▼
+Validate AI Response
+      │
+      ▼
+Calculate Dynamic Score
+      │
+      ▼
+Generate Recommendation
+      │
+      ▼
+Store Structured Analysis
+
+```
+---
 
 ## Tech Stack
 
-### Backend
-
-- Node.js
-- Express.js
-
-### Database
-
-- MongoDB
-- Mongoose
-
-### Authentication
-
-- JSON Web Token (JWT)
-- bcryptjs
-
-### Validation
-
-- Zod
-
-### File Storage
-
-- Cloudinary
-
-### File Upload
-
-- Multer
-
-### Security
-
-- Helmet
-- Cookie Parser
-- CORS
-- Express Rate Limit
+| Category | Technologies |
+|-----------|--------------|
+| Backend | Node.js, Express.js |
+| Database | MongoDB, Mongoose |
+| AI | Groq API, Llama 3.3 70B Versatile |
+| Authentication | JWT, bcryptjs |
+| Validation | Zod |
+| Storage | Cloudinary |
+| File Upload | Multer |
+| Security | Helmet, CORS, HTTP-only Cookies, Rate Limiting |
 
 ---
 
@@ -92,34 +73,24 @@ Shortlist AI is an AI-powered recruitment assistant that helps recruiters organi
 The project follows a layered architecture to keep responsibilities separated.
 
 ```
-Client
-   │
-   ▼
-Routes
-   │
-   ▼
-Controllers
-   │
-   ▼
-Services
-   │
-   ▼
-Repositories
-   │
-   ▼
-MongoDB
+                Client
+                   │
+                   ▼
+                Routes
+                   │
+                   ▼
+             Controllers
+                   │
+                   ▼
+               Services
+         ┌─────────┴─────────┐
+         ▼                   ▼
+Repositories          AI Services
+         │                   │
+         ▼                   ▼
+     MongoDB             Groq API
 ```
 
-### Layer Responsibilities
-
-| Layer | Responsibility |
-|--------|---------------|
-| Routes | Endpoint definitions and middleware |
-| Controllers | Handle HTTP requests and responses |
-| Services | Business logic |
-| Repositories | Database operations |
-| Models | Database schema definitions |
-| Validators | Request validation |
 
 ---
 
@@ -134,6 +105,7 @@ src
 ├── repositories
 ├── routes
 ├── services
+│   └── ai
 ├── utils
 ├── validators
 ├── app.js
@@ -147,6 +119,7 @@ src
 - Node.js 20+
 - MongoDB Atlas or Local MongoDB
 - Cloudinary Account
+- Groq account
 
 ---
 
@@ -165,15 +138,16 @@ git clone https://github.com/Harshit2722/ShortlistAI.git
 cd ShortlistAI
 ```
 
-### 3. Install Dependencies
+### 3. Install Backend Dependencies
 
 ```bash
+cd server
 npm install
 ```
 
 ### 4. Configure Environment Variables
 
-Create a `.env` file in the project root and add the following variables:
+Create a `.env` file inside the `server` directory and add the following variables:
 
 ```env
 PORT=
@@ -195,6 +169,10 @@ CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 
 CLOUDINARY_API_SECRET=
+
+GROQ_API_KEY=
+
+AI_MODEL=
 ```
 
 ### 5. Start the Development Server
@@ -226,7 +204,7 @@ npm run dev
 | PATCH | `/api/v1/jobs/:jobId` |
 | DELETE | `/api/v1/jobs/:jobId` |
 
-### Resume Management
+### Resumes
 
 | Method | Endpoint |
 |---------|----------|
@@ -234,18 +212,8 @@ npm run dev
 | GET | `/api/v1/jobs/:jobId/resumes` |
 | GET | `/api/v1/jobs/:jobId/resumes/:resumeId` |
 | DELETE | `/api/v1/jobs/:jobId/resumes/:resumeId` |
+| POST | `/api/v1/jobs/:jobId/resumes/:resumeId/analyze` |
 
----
 
-
-## Design Principles
-
-- Layered Architecture
-- Repository Pattern
-- Service Layer Pattern
-- Separation of Concerns
-- RESTful API Design
-- Clean Code Practices
-- Modular Backend Architecture
 
 
