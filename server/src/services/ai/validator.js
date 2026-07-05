@@ -16,11 +16,7 @@ const resumeAnalysisSchema = z.object({
         educationScore: z.number().int().min(0).max(10),
         resumeScore: z.number().int().min(0).max(10),
         projectsScore: z.number().int().min(0).max(10),
-
-        recommendation: z.enum(["Strong Match","Good Match","Average Match","Poor Match"]),
-
         summary: z.string(),
-
         strengths: z.array(z.string()),
         weaknesses: z.array(z.string()),
         missingSkills: z.array(z.string())

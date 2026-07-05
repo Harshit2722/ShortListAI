@@ -141,31 +141,6 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
         - Do not include duplicate skills.
         
         ========================
-        RECOMMENDATION RULES
-        ========================
-
-        Strong Match
-        - Meets almost all technical requirements.
-        - Strong technical skills.
-        - Relevant experience.
-        - Few or no critical gaps.
-
-        Good Match
-        - Meets most requirements.
-        - Minor gaps that can be learned quickly.
-
-        Average Match
-        - Meets some requirements.
-        - Noticeable skill or experience gaps.
-        - Suitable with additional training.
-
-        Poor Match
-        - Missing several critical skills.
-        - Experience and technical abilities do not align well with the job.
-
-        - The recommendation must be based on the combined evaluation of all scoring categories and should not rely on any single category.
-
-        ========================
         JOB DETAILS
         ========================
 
@@ -206,7 +181,6 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
             "projectsScore": 0,
             "educationScore": 0,
             "resumeScore": 0,
-            "recommendation": "Strong Match | Good Match | Average Match | Poor Match",
             "summary": "Provide a concise 2-4 sentence summary explaining why the candidate received the evaluation, highlighting major strengths and gaps.",
             "strengths": [
             "string"
