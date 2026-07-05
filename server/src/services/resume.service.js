@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const {uploadResume,deleteResume: deleteResumeFromCloudinary} = require("../utils/cloudinary")
 const {extractTextFromPDF} = require("../utils/pdfParser")
 const {analyzeResume: analyzeResumeWithAI} = require("../services/ai/index")
+const {determineSeniority} = require("../utils/seniority")
 
 const createResume = async (jobId,recruiterId,resumeFile) => {
 
@@ -129,6 +130,7 @@ const analyzeResume = async (resumeId,jobId,recruiterId) => {
 
     await ResumeSubmissionRepository.updateResume(resumeId,{status: "Processing"});
 
+    const seniority = determineSeniority(job.title,job.experience);
     
     try{
         const analysis = await analyzeResumeWithAI({
@@ -136,7 +138,8 @@ const analyzeResume = async (resumeId,jobId,recruiterId) => {
             jobDescription: job.description,
             jobTitle: job.title,
             requiredSkills: job.requiredSkills,
-            requiredExperience: job.experience
+            requiredExperience: job.experience,
+            seniority: seniority
         })
 
         const overallScore = (
