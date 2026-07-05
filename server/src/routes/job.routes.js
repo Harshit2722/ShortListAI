@@ -81,4 +81,12 @@ router.get("/:jobId/resumes",resumeController.getResumesByJob);
  */
 router.delete("/:jobId/resumes/:resumeId",authenticatedLimiter,resumeController.deleteResume);
 
+/**
+ * @route POST /api/v1/jobs/:jobId/resumes/:resumeId/analyze
+ * @desc Analyze resume
+ * @access Private
+ */
+router.post("/:jobId/resumes/:resumeId/analyze",authenticatedLimiter,resumeController.analyzeResume);
+
+
 module.exports = router;

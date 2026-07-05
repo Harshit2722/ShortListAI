@@ -1,9 +1,21 @@
 const { PDFParse } = require("pdf-parse");
+const path = require("path");
 const ApiError = require("./ApiError");
 
 const extractTextFromPDF = async (buffer) => {
     try {
-        const parser = new PDFParse(new Uint8Array(buffer));
+        const standardFontDataUrl = path.join(
+            process.cwd(),
+            "node_modules",
+            "pdfjs-dist",
+            "standard_fonts",
+            "/"
+        );
+
+        const parser = new PDFParse({
+            data: new Uint8Array(buffer),
+            standardFontDataUrl
+        });
 
         const result = await parser.getText();
 

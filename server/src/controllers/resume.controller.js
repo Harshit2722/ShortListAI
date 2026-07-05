@@ -29,9 +29,15 @@ const deleteResume = async (req,res) => {
     return res.status(200).json(new ApiResponse(200,resume,"Resume deleted successfully"));
 }
 
+const analyzeResume = async (req,res) => {
+    const resume = await ResumeService.analyzeResume(req.params.resumeId,req.params.jobId,req.user._id);
+    return res.status(200).json(new ApiResponse(200,resume,"Resume analyzed successfully"));
+}
+
 module.exports = {
     createResume,
     getResumeById,
     getResumesByJob,
-    deleteResume
+    deleteResume,
+    analyzeResume
 }
