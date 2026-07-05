@@ -16,6 +16,10 @@ const createResume = async (jobId,recruiterId,resumeFile) => {
 
     const job = await verifyRecruiterOwnsJob(jobId,recruiterId);
 
+    if(job.status==="Closed"){
+        throw new ApiError(400,"Job is closed. Cannot upload resume now");
+    }
+    
     const applicationDeadline = job.applicationDeadline;
 
     if(applicationDeadline.getTime()< Date.now()){

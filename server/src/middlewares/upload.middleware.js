@@ -1,4 +1,5 @@
 const multer = require("multer");
+const ApiError = require("../utils/ApiError");
 
 const storage = multer.memoryStorage();
 
@@ -9,7 +10,7 @@ const fileFilter = (req,file,cb) => {
         cb(null,true)
     }
     else{
-        cb(new Error("Only PDF and WORD Documents are allowed"),false)
+        cb(new ApiError(400,"Only PDFs are allowed"),false)
     }
 }
 
