@@ -6,6 +6,7 @@ const {uploadResume,deleteResume: deleteResumeFromCloudinary} = require("../util
 const {extractTextFromPDF} = require("../utils/pdfParser")
 const {analyzeResume: analyzeResumeWithAI} = require("../services/ai/index")
 const {determineSeniority} = require("../utils/seniority")
+const {getScoringWeights} = require("../utils/scoringWeights")
 
 const createResume = async (jobId,recruiterId,resumeFile) => {
 
@@ -142,12 +143,14 @@ const analyzeResume = async (resumeId,jobId,recruiterId) => {
             seniority: seniority
         })
 
+        const weights = getScoringWeights(seniority);
+
         const overallScore = (
-            analysis.analysis.skillsScore * 0.40 +
-            analysis.analysis.experienceScore * 0.30 +
-            analysis.analysis.projectsScore * 0.15 +
-            analysis.analysis.educationScore * 0.10 +
-            analysis.analysis.resumeScore * 0.05
+            analysis.analysis.skillsScore * weights.skills +
+            analysis.analysis.experienceScore * weights.experience +
+            analysis.analysis.projectsScore * weights.projects +
+            analysis.analysis.educationScore * weights.education +
+            analysis.analysis.resumeScore * weights.resume
         ).toFixed(1);
 
         analysis.analysis.overallScore = overallScore;
