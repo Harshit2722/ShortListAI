@@ -7,6 +7,9 @@ import {
   BarChart3,
 } from "lucide-react";
 
+import { motion } from "framer-motion";
+import { fadeUp, staggerContainer } from "../../utils/animations";
+
 const features = [
   {
     icon: Brain,
@@ -63,10 +66,11 @@ function Features() {
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{once:true,amount: 0.5}} className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {features.map(({ icon: Icon, title, description }) => (
-          <div
+          <motion.div
             key={title}
+            variants={fadeUp}
             className="rounded-3xl border border-zinc-800 bg-[#181818] p-8 transition duration-300 hover:-translate-y-2 hover:border-zinc-600 hover:shadow-[0_15px_40px_rgba(255,255,255,0.05)] transition-all duration-300"
           >
             <div className="mb-8 inline-flex rounded-2xl border border-zinc-700 bg-zinc-900 p-3">
@@ -80,9 +84,9 @@ function Features() {
             <p className="mt-4 leading-7 text-zinc-400">
               {description}
             </p>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 }

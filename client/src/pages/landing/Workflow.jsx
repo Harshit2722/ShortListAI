@@ -36,8 +36,12 @@ const steps = [
   },
 ];
 
+import {motion} from "framer-motion"
+import {staggerContainer,fadeUp} from "../../utils/animations"
+
 function Workflow() {
   return (
+    <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{once:true,amount: 0.5}}>
     <section
       id="workflow"
       className="mx-auto max-w-7xl px-6 py-28"
@@ -55,8 +59,9 @@ function Workflow() {
 
       <div className="grid gap-6 lg:grid-cols-4">
         {steps.map(({ number, icon: Icon, title, description }) => (
-          <div
+          <motion.div
             key={number}
+            variants={fadeUp}
             className="rounded-3xl border border-zinc-800 bg-[#181818] p-8 transition duration-300 hover:-translate-y-2 hover:border-zinc-600 hover:shadow-[0_15px_40px_rgba(255,255,255,0.05)] transition-all duration-300"
           >
             <span className="text-sm font-medium text-zinc-500 mr-3">
@@ -74,10 +79,11 @@ function Workflow() {
             <p className="mt-4 leading-7 text-zinc-400">
               {description}
             </p>
-          </div>
+          </motion.div>
         ))}
       </div>
     </section>
+    </motion.div>
   );
 }
 

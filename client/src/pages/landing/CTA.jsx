@@ -1,8 +1,17 @@
 import { ArrowRight} from "lucide-react";
 import Button from "../../components/common/Button";
+import { fadeUp } from "../../utils/animations";
+import {motion} from "framer-motion"
+import {Link} from "react-router-dom"
 
 function CTA() {
   return (
+    <motion.div
+    variants={fadeUp}
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.5 }}
+    >
     <section className="px-6 py-28">
       <div className="mx-auto max-w-6xl rounded-[32px] border border-zinc-800 bg-gradient-to-b from-[#1d1d1d] to-[#171717] px-12 py-18 text-center">
 
@@ -18,12 +27,12 @@ function CTA() {
 
         <div className="mt-12 flex flex-wrap justify-center gap-5">
 
-          <a href="/register">
+          <Link href="/register">
             <Button className="flex items-center gap-2">
               Get Started
               <ArrowRight size={18} />
             </Button>
-          </a>
+          </Link>
 
         </div>
 
@@ -64,6 +73,7 @@ function CTA() {
 
       </div>
     </section>
+    </motion.div>
   );
 }
 

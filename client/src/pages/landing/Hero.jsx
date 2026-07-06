@@ -1,10 +1,17 @@
 import { ArrowRight} from "lucide-react";
 import Button from "../../components/common/Button";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { fadeUp } from "../../utils/animations";
 
 
 function Hero() {
   return (
+    <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+    >
     <section className="mx-auto flex min-h-[calc(100vh-96px)] max-w-7xl flex-col items-center justify-center px-6 text-center">
       
       <h1 className="max-w-5xl text-5xl font-semibold leading-tight tracking-tight text-white md:text-7xl">
@@ -38,6 +45,7 @@ function Hero() {
       </div>
 
     </section>
+    </motion.div>
   );
 }
 
