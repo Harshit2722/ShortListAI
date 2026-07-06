@@ -27,7 +27,7 @@ function CTA() {
 
         <div className="mt-12 flex flex-wrap justify-center gap-5">
 
-          <Link href="/register">
+          <Link to="/register">
             <Button className="flex items-center gap-2">
               Get Started
               <ArrowRight size={18} />
