@@ -4,7 +4,7 @@ import Button from "../../components/common/Button";
 function CTA() {
   return (
     <section className="px-6 py-28">
-      <div className="mx-auto max-w-6xl rounded-[32px] border border-zinc-800 bg-[#181818] px-12 py-18 text-center">
+      <div className="mx-auto max-w-6xl rounded-[32px] border border-zinc-800 bg-gradient-to-b from-[#1d1d1d] to-[#171717] px-12 py-18 text-center">
 
         <h2 className="text-5xl font-semibold text-white">
           Ready to hire smarter?

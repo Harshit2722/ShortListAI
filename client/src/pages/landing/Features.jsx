@@ -67,7 +67,7 @@ function Features() {
         {features.map(({ icon: Icon, title, description }) => (
           <div
             key={title}
-            className="rounded-3xl border border-zinc-800 bg-[#181818] p-8 transition duration-300 hover:border-zinc-700 hover:bg-[#1d1d1d]"
+            className="rounded-3xl border border-zinc-800 bg-[#181818] p-8 transition duration-300 hover:-translate-y-2 hover:border-zinc-600 hover:shadow-[0_15px_40px_rgba(255,255,255,0.05)] transition-all duration-300"
           >
             <div className="mb-8 inline-flex rounded-2xl border border-zinc-700 bg-zinc-900 p-3">
               <Icon size={24} />
