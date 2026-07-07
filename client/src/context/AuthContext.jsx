@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
 
     const refreshUser = async () => {
         try {
-            const { data } = await getCurrentUserApi();
+            const data = await getCurrentUserApi();
             setUser(data.data);
         }
         catch (err) {
