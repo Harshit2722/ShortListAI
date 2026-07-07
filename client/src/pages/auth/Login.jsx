@@ -43,6 +43,10 @@ function Login() {
             ...loginData,
             [e.target.name]: e.target.value,
         });
+
+        if(errors[e.target.name]){
+            setErrors(prev => ({...prev, [e.target.name]: ""}));
+        }
     };
 
     const validate = () => {
