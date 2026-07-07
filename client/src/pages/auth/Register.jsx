@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 import AuthLayout from "./AuthLayout";
 import RegisterStepOne from "./RegisterStepOne";
@@ -46,7 +47,22 @@ function Register() {
     const [errors, setErrors] = useState({});
     const [step, setStep] = useState(1);
 
+    const [apiError, setApiError] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const { register } = useAuth();
+
     const [direction, setDirection] = useState(1);
+
+    useEffect(() => {
+    if (!apiError) return;
+
+    const timer = setTimeout(() => {
+        setApiError(null);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+}, [apiError]);
 
     function nextStep() {
         setDirection(1);
@@ -56,15 +72,6 @@ function Register() {
     function prevStep() {
         setDirection(-1);
         setStep(1);
-    }
-
-    function submitForm() {
-        const payload = {
-            ...stepOneData,
-            ...stepTwoData,
-        };
-
-        console.log(payload);
     }
 
     return (
@@ -88,15 +95,22 @@ function Register() {
                                 nextStep={nextStep}
                                 errors={errors}
                                 setErrors={setErrors}
+                                apiError={apiError}
+                                setApiError={setApiError}
                             />
                         ) : (
                             <RegisterStepTwo
                                 stepTwoData={stepTwoData}
                                 setStepTwoData={setStepTwoData}
                                 prevStep={prevStep}
-                                submitForm={submitForm}
+                                stepOneData={stepOneData}
                                 errors={errors}
                                 setErrors={setErrors}
+                                apiError={apiError}
+                                setApiError={setApiError}
+                                isSubmitting={isSubmitting}
+                                setIsSubmitting={setIsSubmitting}
+                                register={register}
                             />
                         )}
 
@@ -106,12 +120,17 @@ function Register() {
 
                 <p className="mt-8 text-center text-zinc-400">
                     Already have an account?{" "}
+                {isSubmitting ? (
+                    <span className="font-medium text-white transition hover:text-zinc-300">Sign in</span>
+                ): (
                     <Link
                         to="/login"
                         className="font-medium text-white transition hover:text-zinc-300"
                     >
                         Sign in
                     </Link>
+
+                )}
                 </p>
             </div>
         </AuthLayout>

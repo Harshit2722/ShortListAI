@@ -8,19 +8,25 @@ function RegisterStepOne({
     nextStep,
     errors,
     setErrors,
+    apiError,
+    setApiError
 }) {
 
     const handleChange = (e) => {
-        setStepOneData({
-            ...stepOneData,
+        setStepOneData(prev => ({
+            ...prev,
             [e.target.name]: e.target.value,
-        })
+        }))
 
         if (errors[e.target.name]) {
-            setErrors({
-                ...errors,
+            setErrors(prev => ({
+                ...prev,
                 [e.target.name]: ""
-            })
+            }))
+        }
+
+        if (apiError) {
+            setApiError(null);
         }
     }
 
@@ -98,7 +104,7 @@ function RegisterStepOne({
                     value={stepOneData.fullName}
                     onChange={handleChange}
                     error={errors.fullName}
-                //   className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-5 py-4 outline-none focus:border-white"
+                    label="Full Name"
                 />
 
                 <Input
@@ -108,7 +114,7 @@ function RegisterStepOne({
                     value={stepOneData.email}
                     onChange={handleChange}
                     error={errors.email}
-                //   className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-5 py-4 outline-none focus:border-white"
+                    label="Email"
                 />
 
                 <Input
@@ -118,7 +124,7 @@ function RegisterStepOne({
                     value={stepOneData.password}
                     onChange={handleChange}
                     error={errors.password}
-                //   className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-5 py-4 outline-none focus:border-white"
+                    label="Password"
                 />
 
             </div>

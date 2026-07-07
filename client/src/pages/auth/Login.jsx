@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAuth } from "../../hooks/useAuth";
+import Loader from "../../components/ui/Loader"
 
 import AuthLayout from "./AuthLayout";
 import Input from "../../components/common/Input";
@@ -36,16 +38,39 @@ function Login() {
         password: "",
     });
 
+    const navigate = useNavigate();
+
     const [errors, setErrors] = useState({});
+    const [apiError, setApiError] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const { login } = useAuth();
+
+    useEffect(() => {
+        if (!apiError) return;
+
+        const timer = setTimeout(() => {
+            setApiError(null);
+        }, 2500);
+
+        return () => clearTimeout(timer);
+    }, [apiError]);
 
     const handleChange = (e) => {
-        setLoginData({
-            ...loginData,
+        setLoginData(prev => ({
+            ...prev,
             [e.target.name]: e.target.value,
-        });
+        }));
 
-        if(errors[e.target.name]){
-            setErrors(prev => ({...prev, [e.target.name]: ""}));
+        if (errors[e.target.name]) {
+            setErrors(prev => ({
+                ...prev,
+                [e.target.name]: ""
+            }));
+        }
+
+        if (apiError) {
+            setApiError(null);
         }
     };
 
@@ -79,14 +104,34 @@ function Login() {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
+
+        if (isSubmitting) return
+
         if (!validate()) return;
 
-        console.log(loginData);
-        setLoginData({
-            email: "",
-            password: "",
-        });
+        try {
+            setApiError(null);
+            setIsSubmitting(true);
+
+            await login(loginData);
+
+            navigate("/dashboard", { replace: true });
+        }
+        catch (err) {
+            const status = err.response?.status;
+
+            if (status === 429) {
+                setApiError("Too many login requests. Please try again later.")
+            } else {
+                setApiError(err.response?.data?.message || "Something went wrong. Please try again later");
+            }
+            console.error(err);
+        }
+        finally {
+            setIsSubmitting(false);
+        }
+
     };
 
 
@@ -110,6 +155,22 @@ function Login() {
                         Sign in to continue managing your recruitment pipeline.
                     </p>
 
+                    <AnimatePresence>
+                        {apiError && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -8 }}
+                                transition={{ duration: 0.2 }}
+                                className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3"
+                            >
+                                <p className="text-sm font-medium text-red-400">
+                                    {apiError}
+                                </p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     <div className="mt-10 space-y-5">
 
                         <Input
@@ -119,6 +180,7 @@ function Login() {
                             onChange={handleChange}
                             placeholder="Enter your email"
                             error={errors.email}
+                            label="Email"
                         />
 
                         <Input
@@ -128,22 +190,29 @@ function Login() {
                             onChange={handleChange}
                             placeholder="Enter your password"
                             error={errors.password}
+                            label="Password"
                         />
 
                     </div>
 
-                    <Button className="mt-8 w-full" onClick={handleLogin}>
-                        Sign In
+                    <Button className="mt-8 w-full" onClick={handleLogin} disabled={isSubmitting}>
+                        {isSubmitting ? <Loader /> : "Sign In"}
                     </Button>
 
                     <p className="mt-8 text-center text-zinc-400">
                         Don't have an account?{" "}
-                        <Link
-                            to="/register"
-                            className="font-medium text-white transition hover:text-zinc-300"
-                        >
-                            Create one
-                        </Link>
+                        {isSubmitting ? (
+                            <span className="font-medium text-zinc-500 cursor-not-allowed">
+                                Create one
+                            </span>
+                        ) : (
+                            <Link
+                                to="/register"
+                                className="font-medium text-white transition hover:text-zinc-300"
+                            >
+                                Create one
+                            </Link>
+                        )}
                     </p>
 
                 </motion.div>

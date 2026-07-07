@@ -1,27 +1,41 @@
 import StepIndicator from "./StepIndicator";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
+import { useNavigate } from "react-router-dom";
+import Loader from "../../components/ui/Loader";
+import { AnimatePresence, motion } from "framer-motion";
 
 function RegisterStepTwo({
     stepTwoData,
     setStepTwoData,
     prevStep,
-    submitForm,
+    stepOneData,
     errors,
     setErrors,
+    apiError,
+    setApiError,
+    isSubmitting,
+    setIsSubmitting,
+    register
 }) {
 
+    const navigate = useNavigate();
+
     const handleChange = (e) => {
-        setStepTwoData({
-            ...stepTwoData,
+        setStepTwoData(prev => ({
+            ...prev,
             [e.target.name]: e.target.value,
-        });
+        }));
 
         if (errors[e.target.name]) {
-            setErrors({
-                ...errors,
+            setErrors(prev => ({
+                ...prev,
                 [e.target.name]: "",
-            });
+            }))
+        }
+
+        if (apiError) {
+            setApiError(null);
         }
     };
 
@@ -52,10 +66,48 @@ function RegisterStepTwo({
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+
+        if (isSubmitting) return
+
         if (!validate()) return;
 
-        submitForm();
+        try {
+            setApiError(null);
+            setIsSubmitting(true);
+
+            const payload = {
+                name: stepOneData.fullName,
+                email: stepOneData.email,
+                password: stepOneData.password,
+                company: stepTwoData.company,
+                designation: stepTwoData.designation
+            }
+
+            await register(payload)
+
+            navigate("/dashboard", { replace: true });
+
+        } catch (err) {
+
+            const status = err.response?.status;
+
+            if (status === 429) {
+                setApiError(
+                    "Too many registration requests. Please try again later."
+                );
+            } else {
+                setApiError(
+                    err.response?.data?.message ||
+                    "Something went wrong. Please try again."
+                );
+            }
+
+        } finally {
+
+            setIsSubmitting(false);
+
+        }
     };
 
     return (
@@ -70,6 +122,22 @@ function RegisterStepTwo({
                 Almost done. Just a few more details.
             </p>
 
+            <AnimatePresence>
+                {apiError && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3"
+                    >
+                        <p className="text-sm font-medium text-red-400">
+                            {apiError}
+                        </p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <div className="mt-10 space-y-5">
 
                 <Input
@@ -78,6 +146,7 @@ function RegisterStepTwo({
                     value={stepTwoData.company}
                     onChange={handleChange}
                     error={errors.company}
+                    label="Company Name"
                 />
 
                 <Input
@@ -86,6 +155,7 @@ function RegisterStepTwo({
                     value={stepTwoData.designation}
                     onChange={handleChange}
                     error={errors.designation}
+                    label="Designation"
                 />
 
             </div>
@@ -96,6 +166,7 @@ function RegisterStepTwo({
                     variant="secondary"
                     onClick={prevStep}
                     className="flex-1"
+                    disabled={isSubmitting}
                 >
                     Back
                 </Button>
@@ -103,8 +174,9 @@ function RegisterStepTwo({
                 <Button
                     onClick={handleSubmit}
                     className="flex-1"
+                    disabled={isSubmitting}
                 >
-                    Create Account
+                    {isSubmitting ? <Loader /> : "Create Account"}
                 </Button>
 
             </div>

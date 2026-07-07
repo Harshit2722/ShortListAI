@@ -15,7 +15,12 @@ export const logout = async () => {
     return data;
 }
 
-export const refreshAccessToken = async (refreshToken) => {
-    const { data } = await api.post("/auth/refresh", { refreshToken })
+export const refreshAccessToken = async () => {
+    const { data } = await api.post("/auth/refresh")
+    return data;
+}
+
+export const getCurrentUser = async () => {
+    const { data } = await api.get("/auth/me")
     return data;
 }

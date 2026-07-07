@@ -4,7 +4,7 @@ function Loader({ size = 24 }) {
   return (
     <LoaderCircle
       size={size}
-      className="animate-spin text-white"
+      className="animate-spin text-black"
     />
   );
 }

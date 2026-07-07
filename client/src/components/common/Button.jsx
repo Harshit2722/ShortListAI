@@ -34,6 +34,7 @@ function Button({
         text-sm
         font-medium
         transition-all
+        cursor-pointer
         duration-200
         disabled:cursor-not-allowed
         disabled:opacity-50
