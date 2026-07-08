@@ -6,7 +6,7 @@ const PublicRoute = ({children}) => {
 
     const {loading,user} = useAuth();
 
-    if(loading) return <Loader size={150} />
+    if(loading) return <div className="h-screen w-full flex items-center justify-center"><Loader size={89}/></div>
 
     if(user) {
         return <Navigate to="/dashboard" replace />;
