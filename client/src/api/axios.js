@@ -72,7 +72,6 @@ api.interceptors.response.use(
         catch (err) {
             isRefreshing = false
             processQueue(err);
-            window.location.replace("/login");
             return Promise.reject(err);
         }
 

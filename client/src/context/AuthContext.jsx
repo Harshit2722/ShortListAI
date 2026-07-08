@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
             setUser(data.data);
         }
         catch (err) {
-            console.error(err);
+            console.error(err.response?.data?.message);
             setUser(null);
         }
         finally {
