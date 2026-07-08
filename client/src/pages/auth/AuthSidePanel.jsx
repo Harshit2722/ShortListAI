@@ -28,7 +28,7 @@ function AuthSidePanel() {
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6">
 
           <p className="text-sm text-zinc-400">
-            Recruiters save hours by letting Shortlist AI analyze
+            Recruiters can now save hours by letting Shortlist AI analyze
             resumes before the interview process begins.
           </p>
 

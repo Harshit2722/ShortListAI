@@ -5,6 +5,7 @@ import Register from "../pages/auth/Register";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 import Dashboard from "../pages/dashboard/Dashboard";
+import ErrorPage from "../components/ui/ErrorPage";
 
 function AppRoutes(){
     return (
@@ -16,6 +17,8 @@ function AppRoutes(){
             <Route path="/register" element={<PublicRoute><Register/></PublicRoute>} />
 
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
+
+            <Route path="*" element={<ErrorPage />} />
         </Routes>
         </BrowserRouter>
     )
