@@ -65,8 +65,30 @@ const authenticatedLimiter = rateLimit({
     }
 });
 
+const sensitiveLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+
+    keyGenerator: (req) => {
+        return req.user._id.toString()
+    },
+
+    standardHeaders: true,
+    legacyHeaders: false,
+
+    skipSuccessfulRequests: true,
+
+    handler: (req,res) => {
+        return res.status(429).json({
+            success: false,
+            message: "Too many sensitive requests. Please try again later."
+        })
+    }
+})
+
 module.exports = {
     publicLimiter,
     refreshLimiter,
-    authenticatedLimiter
+    authenticatedLimiter,
+    sensitiveLimiter
 }
