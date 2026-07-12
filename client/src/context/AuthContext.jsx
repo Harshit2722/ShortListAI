@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { getCurrentUser as getCurrentUserApi, register as registerApi, login as loginApi, logout as logoutApi } from "../api/auth.api.js"
+import {register as registerApi, login as loginApi, logout as logoutApi } from "../api/auth.api.js"
+import {getCurrentUser as getCurrentUserApi} from "../api/user.api.js"
 import { AuthContext } from "./AuthContext.js";
 export const AuthProvider = ({ children }) => {
 
