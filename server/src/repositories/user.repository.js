@@ -25,18 +25,14 @@ async findUserByEmailWithPassword(email) {
     return await User.findOne({ email }).select("+password -__v -createdAt -updatedAt")
 }
 
-async findUserWithoutPassword(id){
-    return await User.findById(id).select("-__v -createdAt -updatedAt")
+async findUserByIdWithPassword(id){
+    return await User.findById(id).select("+password -__v -createdAt -updatedAt")
 }
 
 async existsByEmail(email){
     return await User.exists({
         email
     });
-}
-
-async updateRefreshToken(userId,refreshToken){
-    return await User.findByIdAndUpdate(userId,{refreshToken},{returnDocument: 'after',runValidators:true}).select("-__v -createdAt -updatedAt")
 }
 
 async findUserById(id){
