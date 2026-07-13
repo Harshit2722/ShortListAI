@@ -1,6 +1,7 @@
 const UserRepository = require("../repositories/user.repository")
 const ApiError = require("../utils/ApiError")
-const JobRepository = require("../repositories/job.repository")
+const JobRepository = require("../repositories/job.repository");
+const { deleteAvatar: deleteAvatarFromCloudinary,uploadAvatar: uploadAvatarToCloudinary } = require("../utils/cloudinary");
 
 const updateProfile = async (userId, updateData) => {
 
@@ -93,18 +94,115 @@ const deleteUser = async (userId, password) => {
         throw new ApiError(401, "Account deletion failed due to invalid password")
     }
 
-    const deletedUser = await UserRepository.deleteUser(userId);
+    if (user.avatar?.publicId){
+        try{
+            await deleteAvatarFromCloudinary(user.avatar.publicId);
+        }
+        catch(error){
+            console.error("Failed to delete old avatar:", error.message);
+        }
+    }
 
     await JobRepository.deleteJobsByUserId(userId);
+
+    const deletedUser = await UserRepository.deleteUser(userId);
 
     return deletedUser
 }
 
+const uploadAvatar = async (userId,image) => {
+
+    if(!image || !image.buffer){
+        throw new ApiError(400,"Avatar image is required")
+    }
+
+    const user = await UserRepository.findUserById(userId);
+
+    if(!user){
+        throw new ApiError(404,"User not found")
+    }
+
+    const buffer = image.buffer;
+
+    const result = await uploadAvatarToCloudinary(buffer);
+
+    try{
+        const updatedUser = await UserRepository.updateUser(userId,{
+            avatar:{
+                url:result.url,
+                publicId:result.publicId
+            }
+        })
+
+        if (user.avatar?.publicId){
+            try{
+                await deleteAvatarFromCloudinary(user.avatar.publicId);
+            }
+            catch(error){
+                console.error("Failed to delete old avatar:", error.message);
+            }
+        }
+    
+        return updatedUser;
+    }
+    catch(err){
+        try{
+            await deleteAvatarFromCloudinary(result.publicId);
+        }
+        catch(error){
+            console.error("Failed to cleanup uploaded avatar:", error.message);
+        }
+        console.error("Failed to save avatar in MongoDB",err);
+        throw new ApiError(500,"Failed to save avatar in MongoDB");
+    }
+
+}
+
+const deleteAvatar = async (userId) => {
+
+    const user = await UserRepository.findUserById(userId);
+
+    if(!user){
+        throw new ApiError(404,"User not found")
+    }
+
+    if(!user.avatar?.publicId){
+        throw new ApiError(400,"User does not have an avatar to delete")
+    }
+
+    try{
+        const updatedUser = await UserRepository.updateUser(userId,{
+            avatar:{
+                url:null,
+                publicId:null
+            }
+        })
+        
+        if(user.avatar?.publicId){
+            try{
+                await deleteAvatarFromCloudinary(user.avatar.publicId);
+            }
+            catch(error){
+                console.error("Failed to delete old avatar:", error.message);
+            }
+        }
+    
+        return updatedUser;
+
+    }
+    catch(err){
+        console.error("Failed to delete avatar in MongoDB",err);
+        throw new ApiError(500, "Failed to delete avatar");
+    }
+        
+}
 
 module.exports = {
     updateProfile,
     updateEmail,
     updatePassword,
-    deleteUser
+    deleteUser,
+    uploadAvatar,
+    deleteAvatar
 
 }

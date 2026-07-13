@@ -41,6 +41,11 @@ const errorMiddleware = (err,req,res,next)=>{
         message = "Invalid resource ID"
     }
 
+    else if(err.name === "MulterError"){
+        statusCode = 400
+        message = err.code === "LIMIT_FILE_SIZE" ? "File size exceeds the 5MB limit" : err.message;
+    }
+
     else if(err.name === "JsonWebTokenError"){
         statusCode = 401
         message = "Invalid token"
