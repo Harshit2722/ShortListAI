@@ -3,15 +3,14 @@ const User = require("../models/user.model");
 
 class UserRepository{
 
-async createUser({name,email,password,company,designation,avatar}){
+async createUser({name,email,password,company,designation}){
 
     const user = await User.create({
         name,
         email,
         password,
         company,
-        designation,
-        avatar
+        designation
     })
 
     return user

@@ -33,14 +33,7 @@ const registerSchema = z.object({
     .max(100,"Designation must be at most 100 characters long")
     .trim()
     .regex(/^[a-zA-Z0-9\s.&-]+$/,"Designation can only contain letters, numbers, spaces, dots, ampersands and hyphens")
-    ,
-
-    avatar: z.string({
-        invalid_type_error: "Avatar must be a string"
-    })
-    .url("Invalid URL")
-    .trim()
-    .optional()
+    
 
 }).strict()
 
