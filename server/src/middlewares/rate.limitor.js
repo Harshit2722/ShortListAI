@@ -60,12 +60,12 @@ const authenticatedLimiter = rateLimit({
     handler: (req, res) => {
         return res.status(429).json({
             success: false,
-            message: "Too many requests. Please try again later."
+            message: "Too many requests. Please try again after 15 minutes."
         });
     }
 });
 
-const sensitiveLimiter = rateLimit({
+const emailLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
 
@@ -81,7 +81,49 @@ const sensitiveLimiter = rateLimit({
     handler: (req,res) => {
         return res.status(429).json({
             success: false,
-            message: "Too many sensitive requests. Please try again later."
+            message: "Too many email update attempts. Please try again after 15 minutes."
+        })
+    }
+})
+
+const passwordLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+
+    keyGenerator: (req) => {
+        return req.user._id.toString()
+    },
+
+    standardHeaders: true,
+    legacyHeaders: false,
+
+    skipSuccessfulRequests: true,
+
+    handler: (req,res) => {
+        return res.status(429).json({
+            success: false,
+            message: "Too many password change attempts. Please try again after 15 minutes."
+        })
+    }
+})
+
+const deleteAccountLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 2,
+
+    keyGenerator: (req) => {
+        return req.user._id.toString()
+    },
+
+    standardHeaders: true,
+    legacyHeaders: false,
+
+    skipSuccessfulRequests: true,
+
+    handler: (req,res) => {
+        return res.status(429).json({
+            success: false,
+            message: "Too many account deletion attempts. Please try again after 15 minutes."
         })
     }
 })
@@ -90,5 +132,7 @@ module.exports = {
     publicLimiter,
     refreshLimiter,
     authenticatedLimiter,
-    sensitiveLimiter
+    emailLimiter,
+    passwordLimiter,
+    deleteAccountLimiter
 }

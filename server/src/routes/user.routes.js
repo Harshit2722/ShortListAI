@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const verifyJWT = require("../middlewares/auth.middleware");
-const {authenticatedLimiter, sensitiveLimiter} = require("../middlewares/rate.limitor");
+const {authenticatedLimiter,emailLimiter,passwordLimiter,deleteAccountLimiter} = require("../middlewares/rate.limitor");
 const userController = require("../controllers/user.controller");
 const validate = require("../middlewares/validation.middleware");
 const {updateProfileSchema,updateEmailSchema,updatePasswordSchema,deleteUserSchema} = require("../validators/user.validator");
@@ -19,14 +19,14 @@ router.patch("/profile",verifyJWT, authenticatedLimiter, validate(updateProfileS
  * @description Update current user email
  * @access Private
  */
-router.patch("/email",verifyJWT,sensitiveLimiter,validate(updateEmailSchema),userController.updateEmail)
+router.patch("/email",verifyJWT,emailLimiter,validate(updateEmailSchema),userController.updateEmail)
 
 /**
  * @route PATCH /api/v1/users/password
  * @description Update current user password
  * @access Private
  */
-router.patch("/password",verifyJWT,sensitiveLimiter,validate(updatePasswordSchema),userController.updatePassword)
+router.patch("/password",verifyJWT,passwordLimiter,validate(updatePasswordSchema),userController.updatePassword)
 
 /**
  * @route GET /api/v1/users/me
@@ -40,6 +40,6 @@ router.get("/me",verifyJWT,authenticatedLimiter,userController.getCurrentUser);
  * @description Delete current user account
  * @access Private
  */
-router.delete("/",verifyJWT,sensitiveLimiter,validate(deleteUserSchema),userController.deleteUser);
+router.delete("/",verifyJWT,deleteAccountLimiter,validate(deleteUserSchema),userController.deleteUser);
 
 module.exports = router;
