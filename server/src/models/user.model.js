@@ -27,11 +27,13 @@ const userSchema = new mongoose.Schema({
     },
     company: {
         type: String,
-        trim: true
+        trim: true,
+        required: [true,"Company is required"]
     },
     designation: {
         type: String,
-        trim: true
+        trim: true,
+        required: [true,"Designation is required"]
     },
     avatar: {
         type: String,
