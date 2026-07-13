@@ -49,11 +49,32 @@ const getCurrentUser = async (req,res)=>{
     return res.status(200).json(new ApiResponse(200,req.user,"User Info sent successfully"))
 }
 
+const uploadAvatar = async (req,res) => {
+
+    const image = req.file;
+    const userId = req.user._id;
+
+    const updatedUser = await UserService.uploadAvatar(userId,image);
+
+    return res.status(200).json(new ApiResponse(200,updatedUser,"Avatar updated successfully"))
+}
+
+const deleteAvatar = async (req,res) => {
+
+    const userId = req.user._id;
+
+    const updatedUser = await UserService.deleteAvatar(userId);
+
+    return res.status(200).json(new ApiResponse(200,updatedUser,"Avatar deleted successfully"))
+}
+
 
 module.exports = {
     getCurrentUser,
     updateProfile,
     updateEmail,
     updatePassword,
-    deleteUser
+    deleteUser,
+    uploadAvatar,
+    deleteAvatar
 }

@@ -6,6 +6,7 @@ const {authenticatedLimiter,emailLimiter,passwordLimiter,deleteAccountLimiter} =
 const userController = require("../controllers/user.controller");
 const validate = require("../middlewares/validation.middleware");
 const {updateProfileSchema,updateEmailSchema,updatePasswordSchema,deleteUserSchema} = require("../validators/user.validator");
+const avatarUpload = require("../middlewares/avatar.middleware");
 
 /**
  * @route PATCH /api/v1/users/profile
@@ -41,5 +42,19 @@ router.get("/me",verifyJWT,authenticatedLimiter,userController.getCurrentUser);
  * @access Private
  */
 router.delete("/",verifyJWT,deleteAccountLimiter,validate(deleteUserSchema),userController.deleteUser);
+
+/**
+ * @route POST /api/v1/users/avatar
+ * @description Upload/Update current user avatar
+ * @access Private
+ */
+router.post("/avatar",verifyJWT,authenticatedLimiter,avatarUpload.single("avatar"),userController.uploadAvatar);
+
+/**
+ * @route DELETE /api/v1/users/avatar
+ * @description Delete current user avatar
+ * @access Private
+ */
+router.delete("/avatar",verifyJWT,authenticatedLimiter,userController.deleteAvatar);
 
 module.exports = router;
