@@ -1,7 +1,8 @@
 const UserRepository = require("../repositories/user.repository")
 const ApiError = require("../utils/ApiError")
 const JobRepository = require("../repositories/job.repository");
-const { deleteAvatar: deleteAvatarFromCloudinary,uploadAvatar: uploadAvatarToCloudinary } = require("../utils/cloudinary");
+const { deleteResume: deleteResumeFromCloudinary, deleteAvatar: deleteAvatarFromCloudinary,uploadAvatar: uploadAvatarToCloudinary } = require("../utils/cloudinary");
+const ResumeRepository = require("../repositories/resume.repository");
 
 const updateProfile = async (userId, updateData) => {
 
@@ -94,18 +95,43 @@ const deleteUser = async (userId, password) => {
         throw new ApiError(401, "Account deletion failed due to invalid password")
     }
 
-    if (user.avatar?.publicId){
-        try{
-            await deleteAvatarFromCloudinary(user.avatar.publicId);
-        }
-        catch(error){
-            console.error("Failed to delete old avatar:", error.message);
-        }
+    const avatarPublicId = user.avatar?.publicId;
+
+    const jobs = await JobRepository.findJobIdsByUserId(userId);
+    const jobIds = jobs.map(job => job._id);
+
+    const resumes = await ResumeRepository.findResumesByJobIds(jobIds);
+
+    let deletedUser;
+
+    try{
+        await ResumeRepository.deleteResumesByJobIds(jobIds);
+        await JobRepository.deleteJobsByUserId(userId);
+        deletedUser = await UserRepository.deleteUser(userId);
+    }
+    catch (error) {
+        console.error("Failed to delete user account:", error);
+        throw new ApiError(500, "Failed to delete account");
     }
 
-    await JobRepository.deleteJobsByUserId(userId);
+    if (avatarPublicId) {
+        try {
+            await deleteAvatarFromCloudinary(avatarPublicId);
+        } catch (error) {
+            console.error("Failed to delete avatar from Cloudinary:", error.message);
+        }
+    }
+    
+    for (const resume of resumes) {
+        if(resume.resume?.publicId){
 
-    const deletedUser = await UserRepository.deleteUser(userId);
+            try {
+                await deleteResumeFromCloudinary(resume.resume.publicId);
+            } catch (error) {
+                console.error("Failed to delete resume from Cloudinary:", error.message);
+            }
+        }
+    }
 
     return deletedUser
 }
@@ -126,6 +152,8 @@ const uploadAvatar = async (userId,image) => {
 
     const result = await uploadAvatarToCloudinary(buffer);
 
+    const oldAvatarPublicId = user.avatar?.publicId;
+
     try{
         const updatedUser = await UserRepository.updateUser(userId,{
             avatar:{
@@ -134,12 +162,12 @@ const uploadAvatar = async (userId,image) => {
             }
         })
 
-        if (user.avatar?.publicId){
+        if (oldAvatarPublicId){
             try{
-                await deleteAvatarFromCloudinary(user.avatar.publicId);
+                await deleteAvatarFromCloudinary(oldAvatarPublicId);
             }
             catch(error){
-                console.error("Failed to delete old avatar:", error.message);
+                console.error("Failed to delete previous avatar from Cloudinary:", error.message);
             }
         }
     
@@ -152,8 +180,8 @@ const uploadAvatar = async (userId,image) => {
         catch(error){
             console.error("Failed to cleanup uploaded avatar:", error.message);
         }
-        console.error("Failed to save avatar in MongoDB",err);
-        throw new ApiError(500,"Failed to save avatar in MongoDB");
+        console.error("Failed to update avatar in MongoDB:", err);
+        throw new ApiError(500,"Failed to update avatar in MongoDB");
     }
 
 }
@@ -170,6 +198,8 @@ const deleteAvatar = async (userId) => {
         throw new ApiError(400,"User does not have an avatar to delete")
     }
 
+    const avatarPublicId = user.avatar?.publicId;
+
     try{
         const updatedUser = await UserRepository.updateUser(userId,{
             avatar:{
@@ -178,12 +208,12 @@ const deleteAvatar = async (userId) => {
             }
         })
         
-        if(user.avatar?.publicId){
+        if(avatarPublicId){
             try{
-                await deleteAvatarFromCloudinary(user.avatar.publicId);
+                await deleteAvatarFromCloudinary(avatarPublicId);
             }
             catch(error){
-                console.error("Failed to delete old avatar:", error.message);
+                console.error("Failed to delete previous avatar from Cloudinary:", error.message);
             }
         }
     
