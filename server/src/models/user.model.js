@@ -5,12 +5,12 @@ const jwt = require("jsonwebtoken")
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, "Name is required"], 
+        required: [true, "Name is required"],
         trim: true
     },
     email: {
         type: String,
-        required: [true, "Email is required"], 
+        required: [true, "Email is required"],
         unique: true,
         trim: true,
         lowercase: true
@@ -28,46 +28,52 @@ const userSchema = new mongoose.Schema({
     company: {
         type: String,
         trim: true,
-        required: [true,"Company is required"]
+        required: [true, "Company is required"]
     },
     designation: {
         type: String,
         trim: true,
-        required: [true,"Designation is required"]
+        required: [true, "Designation is required"]
     },
     avatar: {
-        type: String,
-        default: null,
-    },
+        url: {
+            type: String,
+            default: null,
+        },
+        publicId: {
+            type: String,
+            default: null,
+        },
+    }
 }, { timestamps: true });
 
 
-userSchema.pre("save",async function(){
+userSchema.pre("save", async function () {
     const user = this;
 
-    if(!user.isModified("password")) return;
+    if (!user.isModified("password")) return;
 
-    user.password = await bcrypt.hash(user.password,10);
+    user.password = await bcrypt.hash(user.password, 10);
 })
 
-userSchema.methods.comparePassword = async function (enteredPassword){
-    return await bcrypt.compare(enteredPassword,this.password)
+userSchema.methods.comparePassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password)
 }
 
-userSchema.methods.generateAccessToken = function(){
+userSchema.methods.generateAccessToken = function () {
     const payload = {
         id: this._id
     }
 
-    return jwt.sign(payload,process.env.JWT_SECRET,{expiresIn:process.env.JWT_EXPIRY})
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY })
 }
 
-userSchema.methods.generateRefreshToken = function(){
+userSchema.methods.generateRefreshToken = function () {
     const payload = {
         id: this._id
     }
 
-    return jwt.sign(payload,process.env.JWT_REFRESH_SECRET,{expiresIn:process.env.JWT_REFRESH_EXPIRY})
+    return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRY })
 }
 
-module.exports = mongoose.model("User",userSchema)
+module.exports = mongoose.model("User", userSchema)
