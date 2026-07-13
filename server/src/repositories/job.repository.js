@@ -25,6 +25,10 @@ class JobRepository{
     async deleteJobsByUserId(userId){
         return await Job.deleteMany({createdBy: userId})
     }
+
+    async findJobIdsByUserId(userId) {
+        return await Job.find({ createdBy: userId }).select("_id");
+    }
 }
 
 module.exports = new JobRepository()
