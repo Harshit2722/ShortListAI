@@ -5,7 +5,7 @@ const authController = require("../controllers/auth.controller");
 const validate = require("../middlewares/validation.middleware");
 const {registerSchema,loginSchema} = require("../validators/auth.validator");
 const verifyJWT = require("../middlewares/auth.middleware");
-const {publicLimiter, refreshLimiter} = require("../middlewares/rate.limitor");
+const {publicLimiter, refreshLimiter,authenticatedLimiter} = require("../middlewares/rate.limitor");
 
 /**
  * @route POST /api/v1/auth/register
@@ -22,19 +22,11 @@ router.post("/register", publicLimiter, validate(registerSchema), authController
 router.post("/login", publicLimiter, validate(loginSchema), authController.login);
 
 /**
- * @route POST /api/v1/auth/me
- * @description Get current user info
- * @access Private
- */
-router.get("/me", verifyJWT, authController.getCurrentUser);
-
-
-/**
  * @route POST /api/v1/auth/logout
  * @description Logout a user
  * @access Private  
  */
-router.post("/logout", verifyJWT, authController.logout);
+router.post("/logout", verifyJWT, authenticatedLimiter, authController.logout);
 
 /**
  * @route POST /api/v1/auth/refresh

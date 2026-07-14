@@ -22,11 +22,6 @@ const login = async (req,res)=>{
     res.status(200).json(new ApiResponse(200,user,"User logged in successfully"))
 }
 
-const getCurrentUser = async (req,res)=>{
-
-    return res.status(200).json(new ApiResponse(200,req.user,"User Info sent successfully"))
-}
-
 const logout = async (req,res)=>{
 
     await AuthService.logout(req.user._id);
@@ -52,7 +47,6 @@ const refreshAccessToken = async (req,res)=>{
 module.exports = {
     register,
     login,
-    getCurrentUser,
     logout,
     refreshAccessToken
 }   

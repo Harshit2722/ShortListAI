@@ -30,7 +30,36 @@ const deleteResume = async (publicId) => {
     });
 };
 
+const uploadAvatar = (buffer) => {
+    return new Promise((resolve,reject) => {
+
+        const uploadStream = cloudinary.uploader.upload_stream({
+            resource_type: "image",
+            folder: process.env.CLOUDINARY_AVATAR_FOLDER,
+        },(error,result)=>{
+            if(error){
+                return reject(error)
+            }
+            else{
+                resolve({
+                    url: result.secure_url,
+                    publicId: result.public_id
+                })
+            }
+        })
+        streamifier.createReadStream(buffer).pipe(uploadStream);
+    })
+}
+
+const deleteAvatar = async (publicId) => {
+    return await cloudinary.uploader.destroy(publicId, {
+        resource_type: "image"
+    });
+};
+
 module.exports = {
     uploadResume,
-    deleteResume
+    deleteResume,
+    uploadAvatar,
+    deleteAvatar
 };

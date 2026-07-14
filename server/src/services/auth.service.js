@@ -13,9 +13,9 @@ const register = async ({name,email,password,company,designation,avatar})=>{
 
     const {accessToken,refreshToken} = generateTokens(user);
 
-    await UserRepository.updateRefreshToken(user._id,refreshToken);
+    await UserRepository.updateUser(user._id,{refreshToken: refreshToken});
 
-    const finalUser = await UserRepository.findUserWithoutPassword(user._id);
+    const finalUser = await UserRepository.findUserById(user._id);
 
     return {
         user:finalUser,
@@ -37,7 +37,7 @@ const login = async ({email,password})=>{
 
     const {accessToken,refreshToken} = generateTokens(user);
 
-    const updatedUser = await UserRepository.updateRefreshToken(user._id,refreshToken);
+    const updatedUser = await UserRepository.updateUser(user._id,{refreshToken: refreshToken});
 
     return {
         user:updatedUser,
@@ -87,7 +87,7 @@ const refreshAccessToken = async (refreshToken)=>{
 
     const {accessToken,refreshToken: newRefreshToken} = generateTokens(user);
     
-    await UserRepository.updateRefreshToken(user._id,newRefreshToken);
+    await UserRepository.updateUser(user._id,{refreshToken: newRefreshToken});
     
     const safeUser = await UserRepository.findUserById(user._id);
 
