@@ -1,5 +1,7 @@
 const JobRepository = require("../repositories/job.repository")
 const ApiError = require("../utils/ApiError")
+const ResumeRepository = require("../repositories/resume.repository")
+const { deleteResume: deleteResumeFromCloudinary } = require("../utils/cloudinary")
 
 const createJob = async (jobData,recruiterId) => {
 
@@ -103,11 +105,30 @@ const deleteJob = async (jobId,recruiterId) =>{
         throw new ApiError(403,"You can only delete your own jobs")
     }
 
-    const deletedJob = await JobRepository.deleteJob(jobId);
+    const resumes = await ResumeRepository.getResumesByJob(jobId);
+    let deletedJob;
 
-    if(!deletedJob){
+    try{
+        await ResumeRepository.deleteResumesByJob(jobId);
+        deletedJob = await JobRepository.deleteJob(jobId);
+
+    }
+    catch(error){
+        console.error("Failed to delete job",error.message);
         throw new ApiError(500,"Failed to delete job")
     }
+
+    for(const resume of resumes){
+        if (resume.resume?.publicId){
+            try{
+                await deleteResumeFromCloudinary(resume.resume.publicId);
+            }
+            catch(err){
+                console.error("Failed to delete resume from cloudinary",err.message);
+            }
+        }
+    }
+    
 
     return deletedJob
 }

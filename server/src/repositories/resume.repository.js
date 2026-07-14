@@ -25,6 +25,10 @@ class ResumeSubmissionRepository{
         return await ResumeSubmission.find({job:jobId}).select("-__v")
     }
 
+    async deleteResumesByJob(jobId){
+        return await ResumeSubmission.deleteMany({job:jobId});
+    }
+
     async findResumesByJobIds(jobIds){
         return await ResumeSubmission.find({
             job: {$in: jobIds}
