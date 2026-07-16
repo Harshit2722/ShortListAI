@@ -9,6 +9,8 @@ import {
 
 import { motion } from "framer-motion";
 import { fadeUp, staggerContainer } from "../../utils/animations";
+import Card from "../../components/common/Card";
+
 
 const features = [
   {
@@ -66,24 +68,29 @@ function Features() {
         </p>
       </div>
 
-      <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{once:true,amount: 0.5}} className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.7 }} className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {features.map(({ icon: Icon, title, description }) => (
           <motion.div
             key={title}
             variants={fadeUp}
-            className="rounded-3xl border border-zinc-800 bg-[#181818] p-8 transition duration-300 hover:-translate-y-2 hover:border-zinc-600 hover:shadow-[0_15px_40px_rgba(255,255,255,0.05)] transition-all duration-300"
+            className="
+              h-full
+              transition-all duration-300
+            "
           >
-            <div className="mb-8 inline-flex rounded-2xl border border-zinc-700 bg-zinc-900 p-3">
-              <Icon size={24} />
-            </div>
+            <Card className="h-full p-10">
+              <div className="mb-5 inline-flex rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur-md transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/[0.08]">
+                <Icon size={24} />
+              </div>
 
-            <h3 className="text-2xl font-semibold text-white">
-              {title}
-            </h3>
+              <h3 className="text-2xl font-semibold text-white">
+                {title}
+              </h3>
 
-            <p className="mt-4 leading-7 text-zinc-400">
-              {description}
-            </p>
+              <p className="mt-4 leading-7 text-zinc-300/90">
+                {description}
+              </p>
+            </Card>
           </motion.div>
         ))}
       </motion.div>

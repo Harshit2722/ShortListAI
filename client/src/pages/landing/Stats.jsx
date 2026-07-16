@@ -21,7 +21,7 @@ function Stats() {
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="border-b border-zinc-800 bg-[#171717] p-10 text-center transition duration-300 hover:bg-zinc-900 md:border-b-0 md:border-r last:border-r-0"
+            className="border-b border-zinc-800 bg-white/[0.03] backdrop-blur-lg p-10 text-center transition duration-300 hover:bg-zinc-900 md:border-b-0 md:border-r last:border-r-0"
           >
             <h3 className="text-4xl font-semibold text-white">
               {stat.value}
