@@ -1,21 +1,29 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import Silk from "../backgrounds/Silk/Silk";
+import Button from "../common/Button";
 
 function ErrorPage() {
     return (
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-6">
-            
-            <div className="absolute inset-0">
-                <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/5 blur-[140px]" />
-                <div className="absolute -top-32 left-20 h-72 w-72 rounded-full bg-indigo-500/10 blur-[120px]" />
-                <div className="absolute bottom-0 right-10 h-80 w-80 rounded-full bg-sky-500/10 blur-[140px]" />
+
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <Silk
+                    speed={10}
+                    scale={1}
+                    color="#363846"
+                    noiseIntensity={0.7}
+                    rotation={0}
+                />
             </div>
+
+            <div className="pointer-events-none absolute inset-0 z-10 bg-black/45" />
 
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="relative z-10 max-w-xl text-center"
+                className="relative z-20 max-w-xl text-center"
             >
 
                 <motion.h1
@@ -44,16 +52,18 @@ function ErrorPage() {
 
                     <Link
                         to="/"
-                        className="rounded-xl bg-white px-7 py-3 font-medium text-black transition hover:bg-zinc-200"
                     >
-                        Go Home
+                        <Button>
+                            Go Home
+                        </Button>
                     </Link>
 
                     <Link
                         to="/dashboard"
-                        className="rounded-xl border border-zinc-700 bg-zinc-900 px-7 py-3 font-medium text-white transition hover:border-zinc-500 hover:bg-zinc-800"
                     >
-                        Dashboard
+                        <Button variant="secondary">
+                            Dashboard
+                        </Button>
                     </Link>
 
                 </div>
