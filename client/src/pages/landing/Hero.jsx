@@ -28,7 +28,7 @@ function Hero() {
             md:h-[420px] md:w-[700px]
 
             rounded-full
-            bg-indigo-200/[0.18]
+            bg-indigo-200/[0.20]
 
             blur-[120px]
             md:blur-[140px]
