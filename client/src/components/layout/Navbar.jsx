@@ -33,7 +33,7 @@ function Navbar() {
           </Link>
 
           <Link to="/register">
-            <Button>Get Started</Button>
+            <Button>Sign up</Button>
           </Link>
         </div>
       </div>
