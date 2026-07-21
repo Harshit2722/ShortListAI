@@ -44,6 +44,28 @@ const userSchema = new mongoose.Schema({
             type: String,
             default: null,
         },
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    verification: {
+        emailOTP: {
+            type: String,
+            default: null
+        },
+        emailOTPExpiry: {
+            type: Date,
+            default: () => new Date(Date.now() + 10 * 60 * 1000)
+        },
+        forgotPasswordOTP: {
+            type: String,
+            default: null
+        },
+        forgotPasswordOTPExpiry: {
+            type: Date,
+            default: null
+        }
     }
 }, { timestamps: true });
 
