@@ -44,9 +44,49 @@ const loginSchema = z.object({
     
 }).strict()
 
+const verifyEmailSchema = z.object({
+    email: emailSchema,
+
+    otp: z.string({
+        required_error: "OTP is required",
+        invalid_type_error: "OTP must be a string"
+    })
+        .trim()
+        .length(6,"OTP must be 6 digits")
+        .regex(/^[0-9]+$/,"OTP must be numeric")
+    
+}).strict()
+
+const forgotPasswordSchema = z.object({
+    email: emailSchema
+}).strict()
+
+const resetPasswordSchema = z.object({
+    email: emailSchema,
+
+    otp: z.string({
+        required_error: "OTP is required",
+        invalid_type_error: "OTP must be a string"
+    })
+        .trim()
+        .length(6,"OTP must be 6 digits")
+        .regex(/^[0-9]+$/,"OTP must be numeric")
+    ,
+
+    newPassword: passwordSchema
+    
+}).strict()
+
+const resendOtpSchema = z.object({
+    email: emailSchema
+}).strict()
 
 
 module.exports = {
     registerSchema,
-    loginSchema
+    forgotPasswordSchema,
+    resetPasswordSchema,
+    loginSchema,
+    verifyEmailSchema,
+    resendOtpSchema
 }

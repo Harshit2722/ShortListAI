@@ -4,12 +4,37 @@ const { ACCESS_COOKIE_OPTIONS, REFRESH_COOKIE_OPTIONS, BASE_COOKIE_OPTIONS } = r
 
 const register = async (req,res)=>{
 
-    const {user,accessToken,refreshToken} = await AuthService.register(req.body);
+    const {message,email} = await AuthService.register(req.body);
 
-    res.cookie("accessToken",accessToken,ACCESS_COOKIE_OPTIONS)
-    res.cookie("refreshToken",refreshToken,REFRESH_COOKIE_OPTIONS)
+    res.status(201).json(new ApiResponse(201, {email},message))
+}
 
-    res.status(201).json(new ApiResponse(201, user,"User registered successfully"))
+const verifyEmail = async (req,res)=>{
+
+    const {message} = await AuthService.verifyEmail(req.body);
+
+    res.status(200).json(new ApiResponse(200,null,message))
+}
+
+const resendOTP = async (req,res)=>{
+
+    const {message,email} = await AuthService.resendOTP(req.body);
+
+    res.status(200).json(new ApiResponse(200,{email},message))
+}
+
+const forgotPassword = async (req,res)=>{
+
+    const {message,email} = await AuthService.forgotPassword(req.body);
+
+    res.status(200).json(new ApiResponse(200,{email},message))
+}
+
+const resetPassword = async (req,res)=>{
+
+    const {message} = await AuthService.resetPassword(req.body);
+
+    res.status(200).json(new ApiResponse(200,null,message))
 }
 
 const login = async (req,res)=>{
@@ -46,6 +71,10 @@ const refreshAccessToken = async (req,res)=>{
 
 module.exports = {
     register,
+    verifyEmail,
+    resendOTP,
+    forgotPassword,
+    resetPassword,
     login,
     logout,
     refreshAccessToken
