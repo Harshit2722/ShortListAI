@@ -38,9 +38,19 @@ const updateProfileSchema = z.object({
         }
     )
 
-const updateEmailSchema = z.object({
-    password: passwordSchema,
-    newEmail: emailSchema
+const requestEmailChangeSchema = z.object({
+    newEmail: emailSchema,
+    password: passwordSchema
+}).strict()
+
+const verifyEmailChangeSchema = z.object({
+    otp: z.string({
+        required_error: "OTP is required",
+        invalid_type_error: "OTP must be a string"
+    })
+        .trim()
+        .length(6, "OTP must be 6 digits")
+        .regex(/^[0-9]+$/, "OTP must be numeric")
 }).strict()
 
 const updatePasswordSchema = z.object({
@@ -60,7 +70,8 @@ const deleteUserSchema = z.object({
 
 module.exports = {
     updateProfileSchema,
-    updateEmailSchema,
+    requestEmailChangeSchema,
+    verifyEmailChangeSchema,
     updatePasswordSchema,
     deleteUserSchema
 }
