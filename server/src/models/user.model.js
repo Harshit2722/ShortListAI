@@ -58,6 +58,18 @@ const userSchema = new mongoose.Schema({
             type: Date,
             default: () => new Date(Date.now() + 10 * 60 * 1000)
         },
+        emailChangeOTP: {
+            type: String,
+            default: null
+        },
+        emailChangeOTPExpiry: {
+            type: Date,
+            default: () => new Date(Date.now() + 10 * 60 * 1000)
+        },
+        pendingEmail: {
+            type: String,
+            default: null
+        },
         forgotPasswordOTP: {
             type: String,
             default: null
