@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const verifyJWT = require("../middlewares/auth.middleware");
-const {authenticatedLimiter,emailLimiter,passwordLimiter,deleteAccountLimiter} = require("../middlewares/rate.limitor");
+const {authenticatedLimiter,emailLimiter,passwordLimiter,deleteAccountLimiter, publicLimiter} = require("../middlewares/rate.limitor");
 const userController = require("../controllers/user.controller");
 const validate = require("../middlewares/validation.middleware");
-const {updateProfileSchema,updateEmailSchema,updatePasswordSchema,deleteUserSchema} = require("../validators/user.validator");
+const {updateProfileSchema,requestEmailChangeSchema,verifyEmailChangeSchema,updatePasswordSchema,deleteUserSchema} = require("../validators/user.validator");
 const avatarUpload = require("../middlewares/avatar.middleware");
 
 /**
@@ -16,11 +16,18 @@ const avatarUpload = require("../middlewares/avatar.middleware");
 router.patch("/profile",verifyJWT, authenticatedLimiter, validate(updateProfileSchema),userController.updateProfile);
 
 /**
- * @route PATCH /api/v1/users/email
- * @description Update current user email
+ * @route PATCH /api/v1/users/request-email-change
+ * @description Request to update the user's email
  * @access Private
  */
-router.patch("/email",verifyJWT,emailLimiter,validate(updateEmailSchema),userController.updateEmail)
+router.patch("/request-email-change",verifyJWT,emailLimiter,validate(requestEmailChangeSchema),userController.requestEmailChange)
+
+/**
+ * @route PATCH /api/v1/users/verify-email-change
+ * @description Verify the user's email
+ * @access Private
+ */
+router.patch("/verify-email-change",verifyJWT,emailLimiter,validate(verifyEmailChangeSchema),userController.verifyEmailChange)
 
 /**
  * @route PATCH /api/v1/users/password

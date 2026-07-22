@@ -11,13 +11,22 @@ const updateProfile = async (req,res) => {
     return res.status(200).json(new ApiResponse(200,updatedUser,"Profile updated successfully"))
 }
 
-const updateEmail = async (req,res) => {
+const requestEmailChange = async (req,res) => {
     const {newEmail,password} = req.body;
     const userId = req.user._id
 
-    const updatedUser = await UserService.updateEmail(userId,password,newEmail);
+    const {message,email} = await UserService.requestEmailChange(userId,password,newEmail);
 
-    return res.status(200).json(new ApiResponse(200,updatedUser,"Email updated successfully"))
+    return res.status(200).json(new ApiResponse(200,{email},message))
+}
+
+const verifyEmailChange = async (req,res) => {
+    const {otp} = req.body;
+    const userId = req.user._id;
+
+    const {message} = await UserService.verifyEmailChange(userId,otp);
+
+    return res.status(200).json(new ApiResponse(200,null,message))
 }
 
 const updatePassword = async (req,res) => {
@@ -72,7 +81,8 @@ const deleteAvatar = async (req,res) => {
 module.exports = {
     getCurrentUser,
     updateProfile,
-    updateEmail,
+    requestEmailChange,
+    verifyEmailChange,
     updatePassword,
     deleteUser,
     uploadAvatar,
