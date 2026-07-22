@@ -3,6 +3,11 @@ const ApiError = require("../utils/ApiError")
 const JobRepository = require("../repositories/job.repository");
 const { deleteResume: deleteResumeFromCloudinary, deleteAvatar: deleteAvatarFromCloudinary,uploadAvatar: uploadAvatarToCloudinary } = require("../utils/cloudinary");
 const ResumeRepository = require("../repositories/resume.repository");
+const hashValue = require("../utils/hash");
+const generateOTP = require("../utils/generateOTP");
+const EmailService = require("./emailService")
+
+const OTP_EXPIRY_MS = 10 * 60 * 1000;
 
 const updateProfile = async (userId, updateData) => {
 
@@ -15,40 +20,105 @@ const updateProfile = async (userId, updateData) => {
     return updatedUser
 }
 
-const updateEmail = async (userId, password, newEmail) => {
-
+const requestEmailChange = async (userId,password,newEmail) => {
     const user = await UserRepository.findUserByIdWithPassword(userId);
 
-    if (!user) {
-        throw new ApiError(404, "User not found")
+    if(!user){
+        throw new ApiError(404,"User not found")
     }
 
     const isPasswordValid = await user.comparePassword(password)
 
-    if (!isPasswordValid) {
-        throw new ApiError(401, "Invalid password")
+    if(!isPasswordValid){
+        throw new ApiError(401,"Invalid password")
     }
 
-    const formattedEmail = newEmail.trim().toLowerCase();
-
-    if (user.email === formattedEmail) {
-        throw new ApiError(400, "New email cannot be the same as your current email");
+    if(user.email===newEmail){
+        throw new ApiError(400,"Current email and new email cannot be same")
     }
 
-    const emailExists = await UserRepository.existsByEmail(formattedEmail);
-
-    if (emailExists) {
-        throw new ApiError(409, "Email already exists");
+    const emailExists = await UserRepository.existsByEmail(newEmail);
+    if(emailExists){
+        throw new ApiError(409,"Email already exists");
     }
 
-    const updatedUser = await UserRepository.updateUser(userId, { email: formattedEmail })
+    const emailChangeOTP = generateOTP();
+    const hashedOTP = hashValue(emailChangeOTP);
 
-    if (!updatedUser) {
-        throw new ApiError(404, "User not found")
+    await UserRepository.updateUser(userId,{
+        "verification.emailChangeOTP": hashedOTP,
+        "verification.emailChangeOTPExpiry": new Date(Date.now() + OTP_EXPIRY_MS),
+        "verification.pendingEmail": newEmail
+    })
+
+    try{
+        await EmailService.sendEmailChangeVerificationOTP(emailChangeOTP,user.name,newEmail);
+        return {
+            message: "Email change verification OTP sent. Please check your inbox for the OTP.",
+            email: newEmail
+        };
     }
-
-    return updatedUser;
+    catch (err) {
+        console.error("Email change send error:", err);
+        await UserRepository.updateUser(user._id,{
+            "verification.emailChangeOTP": null,
+            "verification.emailChangeOTPExpiry": null,
+            "verification.pendingEmail": null
+        })
+        throw new ApiError(500,"Failed to send email change verification OTP")
+    }
 }
+
+const verifyEmailChange = async (userId,otp) => {
+    const user = await UserRepository.findUserById(userId);
+
+    if(!user){
+        throw new ApiError(404,"User not found")
+    }
+
+    if(!user.verification?.emailChangeOTP || !user.verification?.pendingEmail){
+        throw new ApiError(400,"No email change request found")
+    }
+
+    if(user.verification.emailChangeOTPExpiry < new Date()){
+        await UserRepository.updateUser(user._id, {
+            "verification.emailChangeOTP": null,
+            "verification.emailChangeOTPExpiry": null,
+            "verification.pendingEmail": null
+        })
+        throw new ApiError(400,"Email change OTP has expired")
+    }
+
+    const hashedOTP = hashValue(otp.trim());
+
+    if(user.verification.emailChangeOTP!==hashedOTP){
+        throw new ApiError(400,"Invalid email change OTP")
+    }
+
+    const emailExists = await UserRepository.existsByEmail(user.verification.pendingEmail);
+
+    if(emailExists){
+        await UserRepository.updateUser(user._id, {
+            "verification.emailChangeOTP": null,
+            "verification.emailChangeOTPExpiry": null,
+            "verification.pendingEmail": null
+        })
+        throw new ApiError(409,"Email already exists. Please try again with a different email.");
+    }
+
+
+    await UserRepository.updateUser(user._id, {
+        "verification.emailChangeOTP": null,
+        "verification.emailChangeOTPExpiry": null,
+        email: user.verification.pendingEmail,
+        "verification.pendingEmail": null
+    })
+
+    return {
+        message: "Email updated successfully."
+    }
+}
+
 
 const updatePassword = async (userId, currentPassword, newPassword) => {
 
@@ -229,7 +299,8 @@ const deleteAvatar = async (userId) => {
 
 module.exports = {
     updateProfile,
-    updateEmail,
+    requestEmailChange,
+    verifyEmailChange,
     updatePassword,
     deleteUser,
     uploadAvatar,
