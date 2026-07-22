@@ -11,8 +11,8 @@ Shortlist AI is an AI-powered recruitment assistant that helps recruiters organi
 - Secure JWT authentication using HTTP-only cookies
 - Secure OTP-based email verification upon registration with access guards
 - Password recovery/reset flow driven by secure email OTP validation
-- Standardized, clean HTML email templates for user onboarding and password reset
-- Complete user management (profile, email, password, avatar, account deletion)
+- Standardized, clean HTML email templates for user onboarding, password reset, and email change verification
+- Complete user management (profile, secure two-step email change verification, password, avatar, account deletion)
 - Job posting and management APIs
 - Resume upload and management with duplicate detection (SHA-256)
 - AI-powered resume analysis using Groq LLM
@@ -262,7 +262,8 @@ Once the build is complete and the containers are running, you can access the ap
 | :--- | :--- | :--- | :--- |
 | `GET` | `/me` | Private | Retrieve logged-in recruiter info |
 | `PATCH` | `/profile` | Private | Update user profile metadata |
-| `PATCH` | `/email` | Private | Update registered email |
+| `PATCH` | `/request-email-change` | Private | Request to update email (sends OTP to new email) |
+| `PATCH` | `/verify-email-change` | Private | Verify email change OTP and update registered email |
 | `PATCH` | `/password` | Private | Update password |
 | `POST` | `/avatar` | Private | Upload/Update user avatar (Cloudinary) |
 | `DELETE` | `/avatar` | Private | Delete user avatar |
