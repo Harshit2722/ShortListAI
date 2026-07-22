@@ -9,6 +9,9 @@ Shortlist AI is an AI-powered recruitment assistant that helps recruiters organi
 ## Key Features
 
 - Secure JWT authentication using HTTP-only cookies
+- Secure OTP-based email verification upon registration with access guards
+- Password recovery/reset flow driven by secure email OTP validation
+- Standardized, clean HTML email templates for user onboarding and password reset
 - Complete user management (profile, email, password, avatar, account deletion)
 - Job posting and management APIs
 - Resume upload and management with duplicate detection (SHA-256)
@@ -63,6 +66,7 @@ Store Structured Analysis
 | Database       | MongoDB Atlas, Mongoose                             |
 | AI             | Groq API, Llama 3.3 70B Versatile                   |
 | Authentication | JWT, bcryptjs                                       |
+| Mailing        | Nodemailer                                          |
 | Validation     | Zod                                                 |
 | Storage        | Cloudinary                                          |
 | File Upload    | Multer                                              |
@@ -118,7 +122,7 @@ ShortlistAI/
 │   │   ├── models/          # MongoDB Mongoose schemas
 │   │   ├── repositories/    # Database data-access layer
 │   │   ├── routes/          # Router paths (auth, users, jobs)
-│   │   ├── services/        # AI Service (Groq) and other services(user,auth,job,resume) 
+│   │   ├── services/        # AI Service (Groq), Email service (Nodemailer) and other services(user,auth,job,resume) 
 │   │   └── utils/           # Custom errors and utilities
 │   └── Dockerfile
 └── docker-compose.yml       # Docker orchestrator
@@ -128,12 +132,13 @@ ShortlistAI/
 
 ## Prerequisites
 
-Ensure you have the following things with you:
-- **Node.js** (v20 or higher)
-- **MongoDB** (Local instance or MongoDB Atlas cluster connection URI)
-- **Cloudinary Account** (For secure avatar and resume PDF storage)
-- **Groq Console Account** (For LLM processing)
-- **Docker Desktop** (Required only for containerized setup)
+Ensure you have the following accounts and tools set up:
+- **[Node.js](https://nodejs.org/)** (v20 or higher)
+- **[MongoDB](https://www.mongodb.com/cloud/atlas)** (Local instance or MongoDB Atlas cluster connection URI)
+- **[Cloudinary Account](https://cloudinary.com/)** (For secure avatar and resume PDF storage)
+- **[Groq Console Account](https://console.groq.com/)** (For LLM processing)
+- **[Google Account](https://myaccount.google.com/)** (Required for SMTP email sending. You will need to generate a 16-character **[App Password](https://support.google.com/accounts/answer/185833)** from your Google Account settings to set up the email service).
+- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** (Required only for containerized setup)
 
 ---
 
@@ -164,6 +169,13 @@ cd ShortlistAI
    JWT_REFRESH_EXPIRY=7d
    NODE_ENV=development
 
+   # Mail SMTP Config (Gmail)
+   MAIL_HOST=smtp.gmail.com
+   MAIL_PORT=587
+   MAIL_USER=your_gmail_address@gmail.com
+   MAIL_PASS=your_16_character_app_password
+   MAIL_FROM="Shortlist AI" <your_gmail_address@gmail.com>
+
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
    CLOUDINARY_API_KEY=your_cloudinary_api_key
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
@@ -173,6 +185,15 @@ cd ShortlistAI
    GROQ_API_KEY=your_groq_api_key
    AI_MODEL=llama-3.3-70b-versatile
    ```
+
+> 💡 **Where to get Gmail SMTP Credentials:**
+> 1. Go to your [Google Account Security Settings](https://myaccount.google.com/security).
+> 2. Ensure **2-Step Verification** is enabled for your Google Account.
+> 3. Search for **App Passwords** in the search bar or go directly to the [App Passwords section](https://myaccount.google.com/apppasswords).
+> 4. Create a new App Password (e.g., name it "Shortlist AI").
+> 5. Copy the generated 16-character password and set it as `MAIL_PASS` in your `.env` file.
+> 6. Set `MAIL_USER` and `MAIL_FROM` as your Google email address.
+
 3. Start the backend development server:
    ```bash
    npm run dev
@@ -228,6 +249,10 @@ Once the build is complete and the containers are running, you can access the ap
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/register` | Public | Register a new recruiter account |
+| `POST` | `/verify-email` | Public | Verify email OTP code |
+| `POST` | `/resend-otp` | Public | Resend verification OTP code |
+| `POST` | `/forgot-password` | Public | Send password reset OTP |
+| `POST` | `/reset-password` | Public | Reset password using OTP |
 | `POST` | `/login` | Public | Log in with credentials |
 | `POST` | `/logout` | Private | Clear cookies and log out user |
 | `POST` | `/refresh` | Public | Refresh expired access tokens |
