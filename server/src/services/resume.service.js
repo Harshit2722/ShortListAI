@@ -76,11 +76,11 @@ const getResumeById = async (resumeId,recruiterId,jobId) => {
     return resume;
 }
 
-const getResumesByJob = async (jobId,recruiterId) => {
+const getResumesByJob = async (jobId,recruiterId,page,limit) => {
 
     await verifyRecruiterOwnsJob(jobId,recruiterId);
 
-    const resumes = await ResumeSubmissionRepository.getResumesByJob(jobId);
+    const resumes = await ResumeSubmissionRepository.getResumesByJob(jobId,page,limit);
 
     return resumes;
 }

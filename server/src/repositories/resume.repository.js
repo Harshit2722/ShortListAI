@@ -21,8 +21,14 @@ class ResumeSubmissionRepository{
         return await ResumeSubmission.findById(id).select("-__v")
     }
 
-    async getResumesByJob(jobId){
-        return await ResumeSubmission.find({job:jobId}).select("-__v")
+    async getResumesByJob(jobId,page,limit){
+
+        const skip = (page-1)*limit;
+        
+        return await ResumeSubmission.find({job:jobId})
+                                     .select("-__v")
+                                     .skip(skip)
+                                     .limit(limit)
     }
 
     async deleteResumesByJob(jobId){

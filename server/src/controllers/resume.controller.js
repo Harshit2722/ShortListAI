@@ -17,7 +17,10 @@ const getResumeById = async (req,res) => {
 
 const getResumesByJob = async (req,res) => {
 
-    const resumes = await ResumeService.getResumesByJob(req.params.jobId,req.user._id);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const resumes = await ResumeService.getResumesByJob(req.params.jobId,req.user._id,page,limit);
 
     return res.status(200).json(new ApiResponse(200,resumes,"Resumes fetched successfully"));
 }
