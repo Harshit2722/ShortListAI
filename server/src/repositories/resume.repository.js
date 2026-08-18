@@ -24,11 +24,19 @@ class ResumeSubmissionRepository{
     async getResumesByJob(jobId,page,limit){
 
         const skip = (page-1)*limit;
-        
-        return await ResumeSubmission.find({job:jobId})
+
+        const filter = {job: jobId};
+
+        const [resumes,total] = await Promise.all([
+            ResumeSubmission.find(filter)
                                      .select("-__v")
                                      .skip(skip)
                                      .limit(limit)
+            ,
+            ResumeSubmission.countDocuments(filter)
+        ]);
+        
+        return {resumes,total};
     }
 
     async deleteResumesByJob(jobId){

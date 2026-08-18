@@ -80,9 +80,19 @@ const getResumesByJob = async (jobId,recruiterId,page,limit) => {
 
     await verifyRecruiterOwnsJob(jobId,recruiterId);
 
-    const resumes = await ResumeSubmissionRepository.getResumesByJob(jobId,page,limit);
+    const {resumes,total} = await ResumeSubmissionRepository.getResumesByJob(jobId,page,limit);
 
-    return resumes;
+    const totalPages = Math.ceil(total/limit);
+
+    return {
+        resumes,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages
+        }
+    }
 }
 
 const deleteResume = async (resumeId,recruiterId,jobId) => {
