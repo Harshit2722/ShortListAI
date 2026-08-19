@@ -76,7 +76,7 @@ const getResumeById = async (resumeId,recruiterId,jobId) => {
     return resume;
 }
 
-const getResumesByJob = async (jobId,recruiterId,page,limit,sort,order,search) => {
+const getResumesByJob = async (jobId,recruiterId,page,limit,sort,order,search,status,recommendation,minScore,maxScore) => {
 
     await verifyRecruiterOwnsJob(jobId,recruiterId);
 
@@ -91,7 +91,7 @@ const getResumesByJob = async (jobId,recruiterId,page,limit,sort,order,search) =
     
     const sortOrder = order.toLowerCase()==="asc" ? 1 : -1;
     
-    const {resumes,total} = await ResumeSubmissionRepository.getResumesByJob(jobId,page,limit,sortField,sortOrder,search);
+    const {resumes,total} = await ResumeSubmissionRepository.getResumesByJob(jobId,page,limit,sortField,sortOrder,search,status,recommendation,minScore,maxScore);
 
     const totalPages = Math.ceil(total/limit);
 

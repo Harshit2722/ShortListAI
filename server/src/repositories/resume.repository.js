@@ -21,7 +21,7 @@ class ResumeSubmissionRepository{
         return await ResumeSubmission.findById(id).select("-__v")
     }
 
-    async getResumesByJob(jobId,page,limit,sortField,sortOrder,search){
+    async getResumesByJob(jobId,page,limit,sortField,sortOrder,search,status,recommendation,minScore,maxScore){
 
         const skip = (page-1)*limit;
 
@@ -42,6 +42,26 @@ class ResumeSubmissionRepository{
                     }
                 }
             ]
+        }
+
+        if (status){
+            filter.status = status;
+        }
+
+        if (recommendation){
+            filter["analysis.recommendation"] = recommendation;
+        }
+
+        if (minScore || maxScore){
+            filter["analysis.overallScore"] = {};
+            
+            if (minScore>=0 && minScore<=10){
+                filter["analysis.overallScore"].$gte = minScore;
+            }
+
+            if (maxScore>=0 && maxScore<=10){
+                filter["analysis.overallScore"].$lte = maxScore;
+            }
         }
 
         const sort = {

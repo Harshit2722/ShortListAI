@@ -25,7 +25,18 @@ const getResumesByJob = async (req,res) => {
 
     const search = req.query.search || "";
 
-    const result = await ResumeService.getResumesByJob(req.params.jobId,req.user._id,page,limit,sort,order,search);
+    const status = req.query.status;
+    const recommendation = req.query.recommendation;
+
+    const minScore = req.query.minScore !== undefined
+        ? Number(req.query.minScore)
+        : undefined;
+
+    const maxScore = req.query.maxScore !== undefined
+        ? Number(req.query.maxScore)
+        : undefined;
+
+    const result = await ResumeService.getResumesByJob(req.params.jobId,req.user._id,page,limit,sort,order,search,status,recommendation,minScore,maxScore);
 
     return res.status(200).json(new ApiResponse(200,result,"Resumes fetched successfully"));
 }
