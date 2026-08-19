@@ -76,11 +76,22 @@ const getResumeById = async (resumeId,recruiterId,jobId) => {
     return resume;
 }
 
-const getResumesByJob = async (jobId,recruiterId,page,limit) => {
+const getResumesByJob = async (jobId,recruiterId,page,limit,sort,order) => {
 
     await verifyRecruiterOwnsJob(jobId,recruiterId);
 
-    const {resumes,total} = await ResumeSubmissionRepository.getResumesByJob(jobId,page,limit);
+    
+    const allowedSortFields = {
+        createdAt: "createdAt",
+        overallScore: "analysis.overallScore",
+        name: "candidate.name"
+    }
+    
+    const sortField = allowedSortFields[sort] || "createdAt";
+    
+    const sortOrder = order.toLowerCase()==="asc" ? 1 : -1;
+    
+    const {resumes,total} = await ResumeSubmissionRepository.getResumesByJob(jobId,page,limit,sortField,sortOrder);
 
     const totalPages = Math.ceil(total/limit);
 

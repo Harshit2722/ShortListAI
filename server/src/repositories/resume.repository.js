@@ -21,15 +21,20 @@ class ResumeSubmissionRepository{
         return await ResumeSubmission.findById(id).select("-__v")
     }
 
-    async getResumesByJob(jobId,page,limit){
+    async getResumesByJob(jobId,page,limit,sortField,sortOrder){
 
         const skip = (page-1)*limit;
 
         const filter = {job: jobId};
 
+        const sort = {
+            [sortField]: sortOrder
+        }
+
         const [resumes,total] = await Promise.all([
             ResumeSubmission.find(filter)
                                      .select("-__v")
+                                     .sort(sort)
                                      .skip(skip)
                                      .limit(limit)
             ,
