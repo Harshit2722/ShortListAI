@@ -89,7 +89,7 @@ const getResumesByJob = async (jobId,recruiterId,page,limit,sort,order,search,st
     
     const sortField = allowedSortFields[sort] || "createdAt";
     
-    const sortOrder = order.toLowerCase()==="asc" ? 1 : -1;
+    const sortOrder = order==="asc" ? 1 : -1;
     
     const {resumes,total} = await ResumeSubmissionRepository.getResumesByJob(jobId,page,limit,sortField,sortOrder,search,status,recommendation,minScore,maxScore);
 
