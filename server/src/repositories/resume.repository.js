@@ -21,11 +21,28 @@ class ResumeSubmissionRepository{
         return await ResumeSubmission.findById(id).select("-__v")
     }
 
-    async getResumesByJob(jobId,page,limit,sortField,sortOrder){
+    async getResumesByJob(jobId,page,limit,sortField,sortOrder,search){
 
         const skip = (page-1)*limit;
 
         const filter = {job: jobId};
+
+        if(search){
+            filter.$or = [
+                {
+                    "candidate.name": {
+                        $regex: search,
+                        $options: "i"
+                    }
+                },
+                {
+                    "candidate.email": {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }
+            ]
+        }
 
         const sort = {
             [sortField]: sortOrder

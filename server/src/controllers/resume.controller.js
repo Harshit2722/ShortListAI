@@ -23,7 +23,9 @@ const getResumesByJob = async (req,res) => {
     const sort = req.query.sort || "createdAt";
     const order = req.query.order || "desc";
 
-    const result = await ResumeService.getResumesByJob(req.params.jobId,req.user._id,page,limit,sort,order);
+    const search = req.query.search || "";
+
+    const result = await ResumeService.getResumesByJob(req.params.jobId,req.user._id,page,limit,sort,order,search);
 
     return res.status(200).json(new ApiResponse(200,result,"Resumes fetched successfully"));
 }
