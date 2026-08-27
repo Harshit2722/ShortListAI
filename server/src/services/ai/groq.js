@@ -11,6 +11,7 @@ const generateCompletion = async (prompt) => {
         const completion = await groq.chat.completions.create({
             model: process.env.AI_MODEL,
             temperature: 0.2,
+            response_format: { type: "json_object" },
             messages: [
                 {
                     role: "user",

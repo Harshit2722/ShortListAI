@@ -8,6 +8,8 @@ const verifyJWT = require("../middlewares/auth.middleware");
 const {createJobSchema,updateJobSchema} = require("../validators/job.validator");
 const validate = require("../middlewares/validation.middleware");
 const {authenticatedLimiter} = require("../middlewares/rate.limitor");
+const {resumeListQuerySchema} = require("../validators/resume.validator");
+
 
 router.use(verifyJWT);
 
@@ -72,7 +74,7 @@ router.get("/:jobId/resumes/:resumeId",resumeController.getResumeById);
  * @desc Get all resumes for a job
  * @access Private
  */
-router.get("/:jobId/resumes",resumeController.getResumesByJob);
+router.get("/:jobId/resumes",validate(resumeListQuerySchema,"query"),resumeController.getResumesByJob);
 
 /**
  * @route DELETE /api/v1/jobs/:jobId/resumes/:resumeId
