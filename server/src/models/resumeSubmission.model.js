@@ -125,5 +125,11 @@ const resumeSchema = new mongoose.Schema({
 },{timestamps:true})
 
 resumeSchema.index({job:1,fileHash:1},{unique:true})
+resumeSchema.index({job:1,createdAt:-1});
+resumeSchema.index({ job: 1, "analysis.overallScore": -1 });
+resumeSchema.index({ job: 1, "candidate.name": 1 });
+resumeSchema.index({ job: 1, status: 1 });
+resumeSchema.index({ job: 1, "analysis.recommendation": 1 });
+resumeSchema.index({ "candidate.name": "text", "candidate.email": "text" });
 
 module.exports = mongoose.model("ResumeSubmission",resumeSchema);
