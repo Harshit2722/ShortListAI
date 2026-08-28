@@ -11,11 +11,14 @@ const getDashboard = async (recruiterId) => {
 
     const resumeStats = await DashboardRepository.getResumeStats(jobIds);
 
+    const recentJobs = await DashboardRepository.getRecentJobs(recruiterId);
+
     return {
         stats: {
             ...jobStats,
             ...resumeStats
-        }
+        },
+        recentJobs
     };
 };
 

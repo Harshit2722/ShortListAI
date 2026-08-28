@@ -54,6 +54,13 @@ class DashboardRepository {
             failedAnalysis
         };
     }
+
+    async getRecentJobs(recruiterId) {
+        return await Job.find({ createdBy: recruiterId })
+            .select("-__v")
+            .sort({ createdAt: -1 })
+            .limit(5);
+    }
 }
 
 module.exports = new DashboardRepository();
