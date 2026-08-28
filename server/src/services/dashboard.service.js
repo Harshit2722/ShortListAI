@@ -13,12 +13,15 @@ const getDashboard = async (recruiterId) => {
 
     const recentJobs = await DashboardRepository.getRecentJobs(recruiterId);
 
+    const topCandidates = await DashboardRepository.getTopCandidates(jobIds);
+
     return {
         stats: {
             ...jobStats,
             ...resumeStats
         },
-        recentJobs
+        recentJobs,
+        topCandidates
     };
 };
 

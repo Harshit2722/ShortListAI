@@ -61,6 +61,17 @@ class DashboardRepository {
             .sort({ createdAt: -1 })
             .limit(5);
     }
+
+    async getTopCandidates(jobIds) {
+        return await ResumeSubmission.find({
+            job: { $in: jobIds },
+            status: "Completed",
+            "analysis.overallScore": { $exists: true }
+        })
+            .select("candidate job analysis.overallScore")
+            .sort({ "analysis.overallScore": -1 })
+            .limit(5);
+    }
 }
 
 module.exports = new DashboardRepository();
