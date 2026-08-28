@@ -99,7 +99,8 @@ class DashboardRepository {
             status: "Completed",
             "analysis.overallScore": { $exists: true }
         })
-            .select("candidate job analysis.overallScore")
+            .select("candidate job analysis.overallScore analysis.recommendation")
+            .populate("job", "title")
             .sort({ "analysis.overallScore": -1 })
             .limit(5);
     }
