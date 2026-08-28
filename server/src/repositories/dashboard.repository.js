@@ -55,11 +55,42 @@ class DashboardRepository {
         };
     }
 
-    async getRecentJobs(recruiterId) {
-        return await Job.find({ createdBy: recruiterId })
-            .select("-__v")
-            .sort({ createdAt: -1 })
-            .limit(5);
+    async getRecentJobs(recruiterId){
+        return await Job.aggregate([
+            {
+                $match : {
+                    createdBy: recruiterId
+                }
+            },
+            {
+                $sort: {
+                    createdAt: -1
+                }
+            },
+            {
+                $limit: 5
+            },
+            {
+                $lookup: {
+                    from: "resumesubmissions",
+                    localField: "_id",
+                    foreignField: "job",
+                    as: "resumes"                
+                }
+            },
+            {
+                $project: {
+                    title: 1,
+                    status: 1,
+                    location: 1,
+                    workMode: 1,
+                    createdAt: 1,
+                    candidateCount: {
+                        $size: "$resumes"
+                    }
+                }
+            }
+        ])
     }
 
     async getTopCandidates(jobIds) {
