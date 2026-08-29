@@ -1,52 +1,35 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useCallback} from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
     Briefcase,
     Users,
     Brain,
     Clock,
-    Sparkles,
     Trophy,
     RefreshCw,
-    LogOut,
     MapPin,
     Building2,
     Calendar,
     AlertCircle,
-    ChevronDown
+    ArrowRight,
 } from "lucide-react";
 
 import { getDashboard } from "../../api/dashboard.api";
-import { useAuth } from "../../hooks/useAuth";
-import Silk from "../../components/backgrounds/Silk/Silk";
-import Logo from "../../components/layout/Logo";
 import Card from "../../components/common/Card";
 import StatCard from "../../components/dashboard/StatCard";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/common/Button";
 import { fadeUp, staggerContainer } from "../../utils/animations";
+import { useAuth } from "../../hooks/useAuth";
 
 const Dashboard = () => {
     const [dashboard, setDashboard] = useState(null);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
-    const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-    const profileDropdownRef = useRef(null);
-    const { user, logout } = useAuth();
-
-    // Close profile dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
-                setIsProfileOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    const { user } = useAuth();
 
     const fetchDashboard = useCallback(async (isManualRefresh = false) => {
         try {
@@ -95,104 +78,8 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="relative min-h-screen overflow-x-hidden text-white">
-            {/* Silk Background */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <Silk
-                    speed={10}
-                    scale={1}
-                    color="#363846"
-                    noiseIntensity={0.6}
-                    rotation={0}
-                />
-            </div>
-
-            {/* Dark Backdrop Overlay */}
-            <div className="pointer-events-none fixed inset-0 z-10 bg-black/45" />
-
-            {/* Main Content Layout */}
-            <div className="relative z-20 flex min-h-screen flex-col">
-                {/* Navbar matching common navbar CSS */}
-                <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-2xl border-b border-white/8">
-                    <div className="grid h-20 grid-cols-[1fr_auto_1fr] items-center px-6 lg:px-10">
-                        <div className="justify-self-start">
-                            <Logo />
-                        </div>
-
-                        <div className="justify-self-center hidden md:block">
-                            <span className="text-sm font-medium text-zinc-300">
-                                Recruiter Workspace
-                            </span>
-                        </div>
-
-                        {/* Top Right Profile Icon with Dropdown Tile and Sign Out */}
-                        <div className="flex justify-self-end items-center">
-                            <div className="relative" ref={profileDropdownRef}>
-                                <button
-                                    onClick={() => setIsProfileOpen((prev) => !prev)}
-                                    className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 pr-3 backdrop-blur-md transition duration-200 hover:border-white/25 hover:bg-white/[0.08] cursor-pointer"
-                                    aria-expanded={isProfileOpen}
-                                >
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-800 text-sm font-semibold text-white shadow-inner">
-                                        {user?.name ? user.name.charAt(0).toUpperCase() : "R"}
-                                    </div>
-                                    <span className="hidden text-xs font-medium text-zinc-200 sm:inline-block max-w-[120px] truncate">
-                                        {user?.name || "Recruiter"}
-                                    </span>
-                                    <ChevronDown
-                                        size={14}
-                                        className={`text-zinc-400 transition-transform duration-200 ${isProfileOpen ? "rotate-180" : ""}`}
-                                    />
-                                </button>
-
-                                <AnimatePresence>
-                                    {isProfileOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                                            exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                                            transition={{ duration: 0.15 }}
-                                            className="absolute right-0 mt-2.5 w-64 origin-top-right rounded-2xl border border-white/15 bg-zinc-950/90 p-4 shadow-2xl backdrop-blur-2xl z-50"
-                                        >
-                                            {/* Profile Tile */}
-                                            <div className="flex items-center gap-3 pb-3">
-                                                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-900 border border-white/10 text-base font-semibold text-white shadow-inner">
-                                                    {user?.name ? user.name.charAt(0).toUpperCase() : "R"}
-                                                </div>
-                                                <div className="flex flex-col min-w-0">
-                                                    <span className="truncate text-sm font-semibold text-white">
-                                                        {user?.name || "Recruiter"}
-                                                    </span>
-                                                    <span className="truncate text-xs text-zinc-400">
-                                                        {user?.email || "recruiter@shortlist.ai"}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div className="my-2 border-t border-white/10" />
-
-                                            {/* Sign Out Action */}
-                                            <button
-                                                onClick={() => {
-                                                    setIsProfileOpen(false);
-                                                    logout();
-                                                }}
-                                                className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-red-400 transition duration-150 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
-                                            >
-                                                <LogOut size={15} />
-                                                <span>Sign Out</span>
-                                            </button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
-                <main className="mx-auto w-full max-w-7xl flex-1 px-6 pt-28 pb-12 lg:px-10">
-                    {/* Welcome Header */}
-                    <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <>
+            <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <h1 className="text-3xl font-semibold tracking-tight text-white lg:text-4xl">
                                 Welcome back, {user?.name ? user.name.split(" ")[0] : "Recruiter"}
@@ -214,7 +101,6 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Loading State */}
                     {loading && (
                         <div className="flex min-h-[400px] items-center justify-center">
                             <Card className="flex flex-col items-center justify-center p-12 text-center">
@@ -227,7 +113,6 @@ const Dashboard = () => {
                         </div>
                     )}
 
-                    {/* Error State */}
                     {!loading && error && (
                         <Card className="border-red-500/20 bg-red-500/[0.03] p-8 text-center">
                             <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-red-500/30 bg-red-500/10 text-red-400">
@@ -243,7 +128,6 @@ const Dashboard = () => {
                         </Card>
                     )}
 
-                    {/* Loaded Dashboard Content */}
                     {!loading && !error && dashboard && (
                         <motion.div
                             variants={staggerContainer}
@@ -251,7 +135,6 @@ const Dashboard = () => {
                             animate="visible"
                             className="space-y-10"
                         >
-                            {/* Key Stats Cards Grid */}
                             <motion.div
                                 variants={fadeUp}
                                 className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
@@ -309,9 +192,7 @@ const Dashboard = () => {
                                 />
                             </motion.div>
 
-                            {/* Two-Column Grid: Recent Jobs & Top Candidates */}
                             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                                {/* Recent Job Postings */}
                                 <motion.div variants={fadeUp}>
                                     <Card className="flex h-full flex-col p-7">
                                         <div className="flex items-center justify-between border-b border-white/10 pb-5">
@@ -324,6 +205,14 @@ const Dashboard = () => {
                                                     <p className="text-xs text-zinc-400">Your latest created recruitment positions</p>
                                                 </div>
                                             </div>
+
+                                            <Link
+                                                to="/jobs"
+                                                className="group inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs font-medium text-zinc-300 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
+                                            >
+                                                <span>View all</span>
+                                                <ArrowRight size={13} className="text-zinc-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-white" />
+                                            </Link>
                                         </div>
 
                                         <div className="mt-5 flex-1">
@@ -392,7 +281,6 @@ const Dashboard = () => {
                                     </Card>
                                 </motion.div>
 
-                                {/* Top Evaluated Candidates */}
                                 <motion.div variants={fadeUp}>
                                     <Card className="flex h-full flex-col p-7">
                                         <div className="flex items-center justify-between border-b border-white/10 pb-5">
@@ -405,6 +293,14 @@ const Dashboard = () => {
                                                     <p className="text-xs text-zinc-400">Highest AI match scores across active openings</p>
                                                 </div>
                                             </div>
+
+                                            <Link
+                                                to="/candidates"
+                                                className="group inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs font-medium text-zinc-300 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
+                                            >
+                                                <span>View all</span>
+                                                <ArrowRight size={13} className="text-zinc-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-white" />
+                                            </Link>
                                         </div>
 
                                         <div className="mt-5 flex-1">
@@ -468,9 +364,7 @@ const Dashboard = () => {
                             </div>
                         </motion.div>
                     )}
-                </main>
-            </div>
-        </div>
+        </>
     );
 };
 
