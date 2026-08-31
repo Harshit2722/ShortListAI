@@ -103,7 +103,51 @@ const createJobSchema = z.object({
 
 const updateJobSchema = createJobSchema.partial().strict();
 
+const jobListQuerySchema = z.object({
+
+    page: z.coerce.number().int().min(1).default(1),
+
+    limit: z.coerce.number().int().min(1).max(100).default(5),
+
+    sort: z.enum([
+        "createdAt",
+        "applicationDeadline",
+        "title",
+        "salaryMin",
+        "salaryMax",
+        "experience"
+    ]).default("createdAt"),
+
+    order: z.enum([
+        "asc",
+        "desc"
+    ]).default("desc"),
+
+    search: z.string().trim().optional(),
+
+    status: z.enum([
+        "Open",
+        "Closed"
+    ]).optional(),
+
+    workMode: z.enum([
+        "On-Site",
+        "Remote",
+        "Hybrid"
+    ]).optional(),
+
+    employmentType: z.enum([
+        "Full-Time",
+        "Part-Time",
+        "Contract",
+        "Internship"
+    ]).optional()
+
+}).strict();
+
+
 module.exports = {
     createJobSchema,
-    updateJobSchema
+    updateJobSchema,
+    jobListQuerySchema
 }

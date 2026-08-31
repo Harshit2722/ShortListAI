@@ -31,7 +31,7 @@ const getJobById = async (req,res) => {
 
 const getAllJobsOfARecruiter = async (req,res) => {
 
-    const jobs = await JobService.getAllJobsOfARecruiter(req.user._id,req.query)
+    const jobs = await JobService.getAllJobsOfARecruiter(req.user._id,req.validatedQuery)
 
     return res.status(200).json(new ApiResponse(200,jobs,"Jobs fetched successfully"))
 }

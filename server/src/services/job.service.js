@@ -81,15 +81,45 @@ const getJobById = async (jobId,recruiterId) => {
     return job;
 }
 
-const getAllJobsOfARecruiter = async (recruiterId,filters)=>{
+const getAllJobsOfARecruiter = async (recruiterId,query)=>{
 
-    const query = {
-        ...filters,
-        createdBy: recruiterId
-    }
-    const jobs = await JobRepository.getAllJobs(query);
+    const {
+        page,
+        limit,
+        sort,
+        order,
+        search,
+        status,
+        workMode,
+        employmentType
+    } = query;
 
-    return jobs;
+    const allowedSortFields = {
+        createdAt: "createdAt",
+        applicationDeadline: "applicationDeadline",
+        title: "title",
+        salaryMin: "salary.min",
+        salaryMax: "salary.max",
+        experience: "experience"
+    };
+
+    const sortField = allowedSortFields[sort] || "createdAt";
+
+    const sortOrder = order==="asc" ? 1 : -1;
+
+    const {jobs,total} = await JobRepository.getAllJobs(recruiterId,page,limit,sortField,sortOrder,status,search,employmentType,workMode);
+
+    const totalPages = Math.ceil(total/limit);
+
+    return {
+        jobs,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages
+        }
+    };
     
 }
 

@@ -5,7 +5,7 @@ const jobController = require("../controllers/job.controller");
 const resumeController = require("../controllers/resume.controller");
 const upload = require("../middlewares/upload.middleware")
 const verifyJWT = require("../middlewares/auth.middleware");
-const {createJobSchema,updateJobSchema} = require("../validators/job.validator");
+const {createJobSchema,updateJobSchema,jobListQuerySchema} = require("../validators/job.validator");
 const validate = require("../middlewares/validation.middleware");
 const {authenticatedLimiter} = require("../middlewares/rate.limitor");
 const {resumeListQuerySchema} = require("../validators/resume.validator");
@@ -27,7 +27,7 @@ router.post("/",authenticatedLimiter,validate(createJobSchema),jobController.cre
  * @access Private (Recruiter)
  */
 
-router.get("/",jobController.getAllJobsOfARecruiter);
+router.get("/",validate(jobListQuerySchema,"query"),jobController.getAllJobsOfARecruiter);
 
 /**
  * @route PATCH api/v1/jobs/:jobId
