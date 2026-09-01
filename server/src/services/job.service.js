@@ -156,13 +156,12 @@ const deleteJob = async (jobId,recruiterId) =>{
         throw new ApiError(403,"You can only delete your own jobs")
     }
 
-    const resumes = await ResumeRepository.getResumesByJob(jobId);
+    const resumes = await ResumeRepository.findResumesByJobIds([jobId]);
     let deletedJob;
 
     try{
         await ResumeRepository.deleteResumesByJob(jobId);
         deletedJob = await JobRepository.deleteJob(jobId);
-
     }
     catch(error){
         console.error("Failed to delete job",error.message);
