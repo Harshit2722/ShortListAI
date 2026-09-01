@@ -19,7 +19,7 @@ const RecruiterLayout = ({ children }) => {
             <RecruiterNavbar />
 
             <div className="relative z-20 flex min-h-screen flex-col">
-                <main className="mx-auto w-full max-w-7xl flex-1 px-6 pt-28 pb-12 lg:px-10">
+                <main className="w-full flex-1 px-6 pt-28 pb-12 lg:px-10">
                     {children}
                 </main>
             </div>
