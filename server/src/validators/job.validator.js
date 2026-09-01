@@ -103,6 +103,10 @@ const createJobSchema = z.object({
 
 const updateJobSchema = createJobSchema.partial().strict();
 
+const updateJobStatusSchema = z.object({
+    status: z.enum(["Open", "Closed"])
+}).strict();
+
 const jobListQuerySchema = z.object({
 
     page: z.coerce.number().int().min(1).default(1),
@@ -149,5 +153,6 @@ const jobListQuerySchema = z.object({
 module.exports = {
     createJobSchema,
     updateJobSchema,
+    updateJobStatusSchema,
     jobListQuerySchema
 }

@@ -15,6 +15,19 @@ const updateJob = async (req,res) => {
     return res.status(200).json(new ApiResponse(200,job,"Job updated successfully"))
 }
 
+const updateJobStatus = async (req, res) => {
+
+    const job = await JobService.updateJobStatus(
+        req.params.jobId,
+        req.body.status,
+        req.user._id
+    );
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, job, "Job status updated successfully"));
+};
+
 const deleteJob = async (req,res) => {
 
     const job = await JobService.deleteJob(req.params.jobId,req.user._id);
@@ -39,6 +52,7 @@ const getAllJobsOfARecruiter = async (req,res) => {
 module.exports = {
     createJob,
     updateJob,
+    updateJobStatus,
     deleteJob,
     getJobById,
     getAllJobsOfARecruiter

@@ -66,6 +66,27 @@ const updateJob = async (jobId,jobData,recruiterId) => {
     return updatedJob
 }
 
+const updateJobStatus = async (jobId,status,recruiterId) => {
+
+    const job = await JobRepository.findJobById(jobId);
+
+    if(!job){
+        throw new ApiError(404,"Job not found")
+    }
+
+    if(job.createdBy.toString()!==recruiterId.toString()){
+        throw new ApiError(403,"You can only update your own jobs")
+    }
+
+    const updatedJob = await JobRepository.updateJob(jobId,{"status":status});
+
+    if(!updatedJob){
+        throw new ApiError(500,"Failed to update job status")
+    }
+
+    return updatedJob;
+}
+
 const getJobById = async (jobId,recruiterId) => {
 
     const job = await JobRepository.findJobById(jobId);
@@ -166,6 +187,7 @@ const deleteJob = async (jobId,recruiterId) =>{
 module.exports = {
     createJob,
     updateJob,
+    updateJobStatus,
     getJobById,
     getAllJobsOfARecruiter,
     deleteJob
