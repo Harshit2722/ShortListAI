@@ -20,6 +20,7 @@ import Card from "../../components/common/Card";
 import StatCard from "../../components/dashboard/StatCard";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/common/Button";
+import Loader from "../../components/ui/Loader";
 import { fadeUp, staggerContainer } from "../../utils/animations";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -102,15 +103,7 @@ const Dashboard = () => {
                     </div>
 
                     {loading && (
-                        <div className="flex min-h-[400px] items-center justify-center">
-                            <Card className="flex flex-col items-center justify-center p-12 text-center">
-                                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-md">
-                                    <RefreshCw size={22} className="animate-spin text-white" />
-                                </div>
-                                <h3 className="mt-4 text-lg font-semibold text-white">Loading Dashboard</h3>
-                                <p className="mt-2 text-sm text-zinc-400">Fetching the latest metrics and candidate reports...</p>
-                            </Card>
-                        </div>
+                        <Loader title="Loading Dashboard" subtitle="Fetching the latest metrics and candidate reports..." />
                     )}
 
                     {!loading && error && (
