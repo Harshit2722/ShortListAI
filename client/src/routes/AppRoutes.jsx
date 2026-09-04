@@ -8,6 +8,7 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import ErrorPage from "../components/ui/ErrorPage";
 import RecruiterLayout from "../layouts/RecruiterLayout";
 import Jobs from "../pages/dashboard/Jobs";
+import JobDetails from "../pages/dashboard/JobDetails";
 import Candidates from "../pages/dashboard/Candidates";
 
 function AppRoutes(){
@@ -22,6 +23,7 @@ function AppRoutes(){
             <Route path="/dashboard" element={<ProtectedRoute><RecruiterLayout><Dashboard/></RecruiterLayout></ProtectedRoute>} />
 
             <Route path="/jobs" element={<ProtectedRoute><RecruiterLayout><Jobs/></RecruiterLayout></ProtectedRoute>} />
+            <Route path="/jobs/:jobId" element={<ProtectedRoute><RecruiterLayout><JobDetails/></RecruiterLayout></ProtectedRoute>} />
             <Route path="/candidates" element={<ProtectedRoute><RecruiterLayout><Candidates/></RecruiterLayout></ProtectedRoute>} />
 
             <Route path="*" element={<ErrorPage />} />
