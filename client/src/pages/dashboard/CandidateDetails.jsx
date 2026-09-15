@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     ArrowLeft,
-    Sparkles,
+    BrainCircuit,
     Mail,
     Phone,
     Calendar,
@@ -292,8 +292,8 @@ const CandidateDetails = () => {
                             <div className="absolute top-0 right-0 h-40 w-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
                             <div className="flex items-center gap-2.5 mb-4">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10 text-amber-300">
-                                    <Sparkles size={16} />
+                                <div className="flex h-8 w-8 items-center justify-center rounded-xl border border-indigo-400/20 bg-indigo-500/10 text-indigo-300">
+                                    <BrainCircuit size={16} />
                                 </div>
                                 <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-300">
                                     AI Executive Summary
