@@ -17,7 +17,7 @@ import {
     IndianRupee,
     GraduationCap,
     FileText,
-    Sparkles,
+    Layers
 } from "lucide-react";
 import { getJobById, updateJobStatus, deleteJob } from "../../api/job.api";
 import Card from "../../components/common/Card";
@@ -203,7 +203,7 @@ const JobDetails = () => {
                         {/* Required Skills Section */}
                         <div className="mb-8 pb-8 border-b border-white/10">
                             <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-4">
-                                <Sparkles size={14} className="text-zinc-500" />
+                                <Layers size={14} />
                                 <span>Required Skills</span>
                             </h3>
                             <div className="flex flex-wrap gap-2.5">
@@ -303,7 +303,7 @@ const JobDetails = () => {
 
                     {/* Candidates Link Card */}
                     <Card className="p-7 sm:p-8 transition-all duration-200 hover:border-white/20">
-                        <Link to="/candidates" className="flex items-center justify-between group">
+                        <Link to={`/jobs/${job._id || jobId}/candidates`} className="flex items-center justify-between group">
                             <div className="space-y-2">
                                 <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 block">
                                     Candidates

@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
-import Loader from "../../components/ui/Loader"
 
 import AuthLayout from "./AuthLayout";
 import Input from "../../components/common/Input";
@@ -195,8 +194,14 @@ function Login() {
 
                     </div>
 
-                    <Button className="mt-8 w-full" onClick={handleLogin} disabled={isSubmitting}>
-                        {isSubmitting ? <Loader /> : "Sign In"}
+                    <Button
+                        className="mt-8 w-full"
+                        onClick={handleLogin}
+                        disabled={isSubmitting}
+                        loading={isSubmitting}
+                        loadingText="Signing In..."
+                    >
+                        Sign In
                     </Button>
 
                     <p className="mt-8 text-center text-zinc-400">

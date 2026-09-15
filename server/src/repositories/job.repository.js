@@ -1,4 +1,5 @@
 const Job = require("../models/job.model");
+const ResumeSubmission = require("../models/resumeSubmission.model");
 
 class JobRepository {
 
@@ -7,7 +8,15 @@ class JobRepository {
     }
 
     async findJobById(id) {
-        return await Job.findById(id).select("-__v")
+        const [job, candidateCount] = await Promise.all([
+            Job.findById(id).select("-__v").lean(),
+            ResumeSubmission.countDocuments({ job: id })
+        ]);
+
+        if (!job) return null;
+
+        job.candidateCount = candidateCount;
+        return job;
     }
 
     async updateJob(id, updateData) {
@@ -51,7 +60,8 @@ class JobRepository {
                .sort(sortOptions)
                .skip(skip)
                .limit(limit)
-               .select("-__v"),
+               .select("-__v")
+               .lean(),
 
             Job.countDocuments(filters)
         ])

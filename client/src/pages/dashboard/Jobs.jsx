@@ -191,6 +191,7 @@ const Jobs = () => {
                             pagination={pagination}
                             onPageChange={setPage}
                             disabled={isSearching}
+                            itemLabel="jobs"
                         />
                     </motion.div>
                 </motion.div>
