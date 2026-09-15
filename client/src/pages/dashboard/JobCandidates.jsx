@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, AlertCircle, RotateCcw } from "lucide-react";
+import { ArrowLeft, Users, AlertCircle, RotateCcw, Upload } from "lucide-react";
 import { getJobById } from "../../api/job.api";
 import { getJobCandidates } from "../../api/candidate.api";
 import CandidateFilters from "../../components/candidates/CandidateFilters";
 import CandidateList from "../../components/candidates/CandidateList";
+import UploadResumeModal from "../../components/candidates/UploadResumeModal";
 import Pagination from "../../components/common/Pagination";
 import Card from "../../components/common/Card";
 import Button from "../../components/common/Button";
@@ -30,6 +31,7 @@ const JobCandidates = () => {
     const [initialLoading, setInitialLoading] = useState(true);
     const [isSearching, setIsSearching] = useState(false);
     const [error, setError] = useState(null);
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
     const [page, setPage] = useState(1);
     const limit = 10;
@@ -119,14 +121,26 @@ const JobCandidates = () => {
                 </Link>
             </motion.div>
 
-            {/* Header: Job Title & Applicant Count */}
-            <motion.div variants={fadeUp} initial="hidden" animate="visible" className="space-y-1">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">
-                    {job?.title || "Candidates"}
-                </h1>
-                <p className="text-sm font-medium text-zinc-400">
-                    {totalApplicants} {totalApplicants === 1 ? "Applicant" : "Applicants"}
-                </p>
+            {/* Header: Job Title & Applicant Count & Upload Button */}
+            <motion.div variants={fadeUp} initial="hidden" animate="visible" className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="space-y-1">
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white">
+                        {job?.title || "Candidates"}
+                    </h1>
+                    <p className="text-sm font-medium text-zinc-400">
+                        {totalApplicants} {totalApplicants === 1 ? "Applicant" : "Applicants"}
+                    </p>
+                </div>
+
+                {job?.status !== "Closed" && (
+                    <Button
+                        onClick={() => setIsUploadModalOpen(true)}
+                        className="flex items-center gap-2 self-start sm:self-auto text-xs py-2.5 px-4"
+                    >
+                        <Upload size={14} />
+                        <span>Upload Resume</span>
+                    </Button>
+                )}
             </motion.div>
 
             {/* Filter Bar */}
@@ -175,7 +189,7 @@ const JobCandidates = () => {
                             ? "No candidates matched your search criteria. Try adjusting your filters or search terms."
                             : "No resumes have been uploaded for this job yet."}
                     </p>
-                    {hasActiveFilters && (
+                    {hasActiveFilters ? (
                         <button
                             onClick={handleReset}
                             className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.06] px-4 py-2 text-xs font-medium text-white transition hover:bg-white/[0.12] cursor-pointer"
@@ -183,6 +197,16 @@ const JobCandidates = () => {
                             <RotateCcw size={13} />
                             <span>Clear all filters</span>
                         </button>
+                    ) : (
+                        job?.status !== "Closed" && (
+                            <Button
+                                onClick={() => setIsUploadModalOpen(true)}
+                                className="mt-4 flex items-center gap-1.5 text-xs py-2 px-4"
+                            >
+                                <Upload size={14} />
+                                <span>Upload First Resume</span>
+                            </Button>
+                        )
                     )}
                 </motion.div>
             )}
@@ -213,6 +237,18 @@ const JobCandidates = () => {
                     </motion.div>
                 </motion.div>
             )}
+
+            {/* Upload Resume Modal */}
+            <UploadResumeModal
+                isOpen={isUploadModalOpen}
+                onClose={() => setIsUploadModalOpen(false)}
+                jobId={jobId}
+                jobTitle={job?.title}
+                onSuccess={() => {
+                    fetchCandidates();
+                    fetchJobDetails();
+                }}
+            />
         </div>
     );
 };

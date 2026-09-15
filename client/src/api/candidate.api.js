@@ -10,6 +10,19 @@ export const getCandidateById = async (jobId, candidateId) => {
     return data;
 };
 
+export const uploadCandidateResume = async (jobId, resume, onUploadProgress) => {
+    const formData = new FormData();
+    formData.append("resume", resume);
+
+    const { data } = await api.post(`/jobs/${jobId}/resumes`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress,
+    });
+    return data;
+};
+
 export const deleteCandidate = async (jobId, candidateId) => {
     const { data } = await api.delete(`/jobs/${jobId}/resumes/${candidateId}`);
     return data;
