@@ -10,7 +10,7 @@ import RecruiterLayout from "../layouts/RecruiterLayout";
 import Jobs from "../pages/dashboard/Jobs";
 import JobDetails from "../pages/dashboard/JobDetails";
 import JobCandidates from "../pages/dashboard/JobCandidates";
-import CandidateDetailsPlaceholder from "../pages/dashboard/CandidateDetailsPlaceholder";
+import CandidateDetails from "../pages/dashboard/CandidateDetails";
 
 function AppRoutes(){
     return (
@@ -26,7 +26,7 @@ function AppRoutes(){
             <Route path="/jobs" element={<ProtectedRoute><RecruiterLayout><Jobs/></RecruiterLayout></ProtectedRoute>} />
             <Route path="/jobs/:jobId" element={<ProtectedRoute><RecruiterLayout><JobDetails/></RecruiterLayout></ProtectedRoute>} />
             <Route path="/jobs/:jobId/candidates" element={<ProtectedRoute><RecruiterLayout><JobCandidates/></RecruiterLayout></ProtectedRoute>} />
-            <Route path="/jobs/:jobId/candidates/:candidateId" element={<ProtectedRoute><RecruiterLayout><CandidateDetailsPlaceholder/></RecruiterLayout></ProtectedRoute>} />
+            <Route path="/jobs/:jobId/candidates/:candidateId" element={<ProtectedRoute><RecruiterLayout><CandidateDetails/></RecruiterLayout></ProtectedRoute>} />
             <Route path="/candidates" element={<Navigate to="/jobs" replace />} />
 
             <Route path="*" element={<ErrorPage />} />
