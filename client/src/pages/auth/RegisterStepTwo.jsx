@@ -2,7 +2,6 @@ import StepIndicator from "./StepIndicator";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
 import { useNavigate } from "react-router-dom";
-import Loader from "../../components/ui/Loader";
 import { AnimatePresence, motion } from "framer-motion";
 
 function RegisterStepTwo({
@@ -175,8 +174,10 @@ function RegisterStepTwo({
                     onClick={handleSubmit}
                     className="flex-1"
                     disabled={isSubmitting}
+                    loading={isSubmitting}
+                    loadingText="Creating Account..."
                 >
-                    {isSubmitting ? <Loader /> : "Create Account"}
+                    Create Account
                 </Button>
 
             </div>
