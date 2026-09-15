@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const Pagination = ({ pagination, onPageChange, disabled = false }) => {
+const Pagination = ({ pagination, onPageChange, disabled = false, itemLabel = "items" }) => {
     if (!pagination || pagination.totalPages <= 1) return null;
 
     const { page, limit, total, totalPages } = pagination;
@@ -19,7 +19,7 @@ const Pagination = ({ pagination, onPageChange, disabled = false }) => {
             <p className="text-xs text-zinc-400">
                 Showing <span className="font-semibold text-white">{(page - 1) * limit + 1}</span> to{" "}
                 <span className="font-semibold text-white">{Math.min(page * limit, total)}</span> of{" "}
-                <span className="font-semibold text-white">{total}</span> jobs
+                <span className="font-semibold text-white">{total}</span> {itemLabel}
             </p>
 
             <div className="flex items-center gap-2">
