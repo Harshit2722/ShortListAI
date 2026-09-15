@@ -303,7 +303,7 @@ const JobDetails = () => {
 
                     {/* Candidates Link Card */}
                     <Card className="p-7 sm:p-8 transition-all duration-200 hover:border-white/20">
-                        <Link to="/candidates" className="flex items-center justify-between group">
+                        <Link to={`/jobs/${job._id || jobId}/candidates`} className="flex items-center justify-between group">
                             <div className="space-y-2">
                                 <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 block">
                                     Candidates

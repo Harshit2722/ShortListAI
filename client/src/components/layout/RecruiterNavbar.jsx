@@ -15,10 +15,6 @@ const navItems = [
         label: "Jobs",
         path: "/jobs",
     },
-    {
-        label: "Candidates",
-        path: "/candidates",
-    },
 ];
 
 const RecruiterNavbar = () => {
