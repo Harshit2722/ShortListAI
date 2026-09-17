@@ -18,7 +18,7 @@ const errorMiddleware = (err,req,res,next)=>{
         }))
 
         statusCode = 400
-        message = "Validation error"
+        message = validationErrors[0]?.message || "Invalid request data"
     }
 
     else if(err.name === "ValidationError"){
@@ -27,7 +27,7 @@ const errorMiddleware = (err,req,res,next)=>{
             message: error.message
         }))
         statusCode = 400
-        message = "Validation error"
+        message = validationErrors[0]?.message || "Invalid request data"
     }
 
     else if(err.code===11000){
@@ -54,6 +54,11 @@ const errorMiddleware = (err,req,res,next)=>{
     else if(err.name === "TokenExpiredError" ){
         statusCode=401
         message="Token has expired"
+    }
+
+    else if(err.name === "MongooseError" || (err.message && err.message.includes("buffering timed out"))){
+        statusCode = 503;
+        message = "Database service is temporarily unavailable. Please try again in a moment.";
     }
 
     const response = {
