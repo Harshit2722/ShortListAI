@@ -14,6 +14,10 @@ const generateCompletion = async (prompt) => {
             response_format: { type: "json_object" },
             messages: [
                 {
+                    role: "system",
+                    content: "You are an expert technical recruiter evaluating resumes against job descriptions. Always respond with a valid JSON object strictly containing 'candidate' and 'analysis' top-level objects."
+                },
+                {
                     role: "user",
                     content: prompt
                 }
