@@ -29,8 +29,33 @@ const Jobs = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [error, setError] = useState(null);
 
+    const getResponsiveLimit = () => {
+        if (typeof window === "undefined") return 8;
+        // 2xl screens (>= 1536px) render 4 columns: 4 * 2 = 8 fills rows completely without empty gaps
+        if (window.innerWidth >= 1536) return 8;
+        // lg screens (>= 1024px) render 3 columns: 3 * 2 = 6 fills rows completely
+        // md screens (>= 768px) render 2 columns: 2 * 3 = 6 fills rows completely
+        return 6;
+    };
+
     const [page, setPage] = useState(1);
-    const limit = 6;
+    const [limit, setLimit] = useState(getResponsiveLimit);
+
+    useEffect(() => {
+        const handleResize = () => {
+            const nextLimit = getResponsiveLimit();
+            setLimit((prev) => {
+                if (prev !== nextLimit) {
+                    setPage(1);
+                    return nextLimit;
+                }
+                return prev;
+            });
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const [filters, setFilters] = useState(INITIAL_FILTERS);
     const debouncedSearch = useDebounce(filters.search, 400);

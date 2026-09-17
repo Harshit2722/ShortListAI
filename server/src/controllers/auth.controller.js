@@ -30,6 +30,13 @@ const forgotPassword = async (req,res)=>{
     res.status(200).json(new ApiResponse(200,{email},message))
 }
 
+const verifyResetOtp = async (req,res)=>{
+
+    const {message, resetToken} = await AuthService.verifyResetOtp(req.body);
+
+    res.status(200).json(new ApiResponse(200,{resetToken},message))
+}
+
 const resetPassword = async (req,res)=>{
 
     const {message} = await AuthService.resetPassword(req.body);
@@ -74,6 +81,7 @@ module.exports = {
     verifyEmail,
     resendOTP,
     forgotPassword,
+    verifyResetOtp,
     resetPassword,
     login,
     logout,

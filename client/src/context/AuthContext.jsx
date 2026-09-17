@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (formData) => {
         const data = await registerApi(formData);
-        setUser(data.data);
         return data;
     }
 
