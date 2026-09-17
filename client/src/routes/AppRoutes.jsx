@@ -2,6 +2,7 @@ import { BrowserRouter,Routes,Route,Navigate } from "react-router-dom";
 import Home from "../pages/landing/Home";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
+import ForgotPassword from "../pages/auth/ForgotPassword";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 import Dashboard from "../pages/dashboard/Dashboard";
@@ -20,6 +21,7 @@ function AppRoutes(){
 
             <Route path="/login" element={<PublicRoute><Login/></PublicRoute>} />
             <Route path="/register" element={<PublicRoute><Register/></PublicRoute>} />
+            <Route path="/forgot-password" element={<PublicRoute><ForgotPassword/></PublicRoute>} />
 
             <Route path="/dashboard" element={<ProtectedRoute><RecruiterLayout><Dashboard/></RecruiterLayout></ProtectedRoute>} />
 
