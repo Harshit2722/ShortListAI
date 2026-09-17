@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import StepIndicator from "./StepIndicator";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
@@ -11,6 +13,7 @@ function RegisterStepOne({
     apiError,
     setApiError
 }) {
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         setStepOneData(prev => ({
@@ -50,25 +53,23 @@ function RegisterStepOne({
 
         if (!stepOneData.email.trim()) {
             newErrors.email = "Email is required";
-        } else if (
-            !/^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+.-]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9-]*\.)+[A-Za-z]{2,}$/
-                .test(stepOneData.email)
-        ) {
-            newErrors.email = "Please enter a valid email address";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(stepOneData.email)) {
+            newErrors.email = "Enter a valid email address";
         }
-
 
         if (!stepOneData.password) {
             newErrors.password = "Password is required";
         } else if (stepOneData.password.length < 8) {
-            newErrors.password = "Password must be at least 8 characters";
+            newErrors.password = "Password must be at least 8 characters long";
+        } else if (stepOneData.password.length > 64) {
+            newErrors.password = "Password must be at most 64 characters long";
         } else if (!/[A-Z]/.test(stepOneData.password)) {
             newErrors.password = "Password must contain at least one uppercase letter";
         } else if (!/[a-z]/.test(stepOneData.password)) {
             newErrors.password = "Password must contain at least one lowercase letter";
         } else if (!/[0-9]/.test(stepOneData.password)) {
             newErrors.password = "Password must contain at least one number";
-        } else if (!/[!@#$%^&*]/.test(stepOneData.password)) {
+        } else if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(stepOneData.password)) {
             newErrors.password = "Password must contain at least one special character";
         }
 
@@ -85,7 +86,7 @@ function RegisterStepOne({
 
     return (
         <>
-            <StepIndicator step={1} />
+            <StepIndicator step={1} totalSteps={3} />
 
             <h1 className="text-4xl font-semibold text-white">
                 Create your account
@@ -118,13 +119,24 @@ function RegisterStepOne({
                 />
 
                 <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     name="password"
                     value={stepOneData.password}
                     onChange={handleChange}
                     error={errors.password}
                     label="Password"
+                    endElement={
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="text-zinc-400 hover:text-white transition-colors cursor-pointer p-1"
+                            tabIndex={-1}
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    }
                 />
 
             </div>
