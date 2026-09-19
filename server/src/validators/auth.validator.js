@@ -40,7 +40,10 @@ const registerSchema = z.object({
 const loginSchema = z.object({
     email: emailSchema,
 
-    password: passwordSchema
+    password: z.string({
+        required_error: "Password is required",
+        invalid_type_error: "Password must be a string"
+    }).min(1, "Password is required")
     
 }).strict()
 
@@ -62,18 +65,12 @@ const forgotPasswordSchema = z.object({
 }).strict()
 
 const resetPasswordSchema = z.object({
-    email: emailSchema,
+    resetToken: z.string({
+        required_error: "Reset token is required",
+        invalid_type_error: "Reset token must be a string"
+    }).trim(),
 
-    otp: z.string({
-        required_error: "OTP is required",
-        invalid_type_error: "OTP must be a string"
-    })
-        .trim()
-        .length(6,"OTP must be 6 digits")
-        .regex(/^[0-9]+$/,"OTP must be numeric")
-    ,
-
-    newPassword: passwordSchema
+    newPassword: passwordSchema,
     
 }).strict()
 

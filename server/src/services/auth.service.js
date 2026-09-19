@@ -163,38 +163,89 @@ const forgotPassword = async ({email}) => {
     }
 }
 
-const resetPassword = async ({email,otp,newPassword}) => {
+const verifyResetOtp = async ({ email, otp }) => {
 
     const user = await UserRepository.findUserByEmail(email);
 
-    if(!user){
-        throw new ApiError(404,"User not found")
+    if (!user) {
+        throw new ApiError(404, "User not found");
     }
 
-    if(!user.verification.forgotPasswordOTP || !user.verification.forgotPasswordOTPExpiry){
-        throw new ApiError(400,"Forgot password OTP was not requested or is invalid")
+    if (!user.verification.forgotPasswordOTP || !user.verification.forgotPasswordOTPExpiry) {
+        throw new ApiError(400, "Forgot password OTP was not requested or is invalid");
     }
 
     if (user.verification.forgotPasswordOTPExpiry < new Date()) {
-        throw new ApiError(400,"Forgot password OTP is expired")
+        throw new ApiError(400, "Forgot password OTP is expired");
     }
 
     const hashedOTP = hashValue(otp.trim());
 
-    if(user.verification.forgotPasswordOTP !== hashedOTP){
-        throw new ApiError(400,"Forgot password OTP is invalid")
+    if (user.verification.forgotPasswordOTP !== hashedOTP) {
+        throw new ApiError(400, "Forgot password OTP is invalid");
+    }
+
+    const resetToken = jwt.sign(
+        { id: user._id, email: user.email, purpose: "password-reset" },
+        process.env.JWT_SECRET,
+        { expiresIn: "10m" }
+    );
+
+    return {
+        message: "OTP verified successfully",
+        resetToken
+    };
+};
+
+const resetPassword = async ({ resetToken, newPassword }) => {
+
+    let user;
+
+    if (resetToken) {
+        let decoded;
+        try {
+            decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
+        } catch (err) {
+            throw new ApiError(400, "Reset session has expired or is invalid. Please request a new OTP.");
+        }
+
+        if (!decoded || decoded.purpose !== "password-reset") {
+            throw new ApiError(400, "Invalid reset token");
+        }
+
+        user = await UserRepository.findUserByIdWithPassword(decoded.id);
+
+    } else {
+        throw new ApiError(400, "Reset token is required");
+    }
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    if (!user.verification.forgotPasswordOTP || !user.verification.forgotPasswordOTPExpiry) {
+        throw new ApiError(400, "Forgot password OTP was not requested or has expired");
+    }
+
+    if (user.verification.forgotPasswordOTPExpiry < new Date()) {
+        throw new ApiError(400, "Forgot password OTP is expired");
+    }
+
+    const isSamePassword = await user.comparePassword(newPassword);
+    if (isSamePassword) {
+        throw new ApiError(400, "New password cannot be the same as your old password");
     }
 
     user.password = newPassword;
     user.verification.forgotPasswordOTP = null;
     user.verification.forgotPasswordOTPExpiry = null;
-    user.isVerified = true
-    user.refreshToken = null
+    user.isVerified = true;
+    user.refreshToken = null;
 
     await user.save();
 
     return {
-        message:"Password reset successful"
+        message: "Password reset successful"
     };
         
 }
@@ -253,7 +304,13 @@ const refreshAccessToken = async (refreshToken) => {
         throw new ApiError(401, "Refresh token not found")
     }
 
-    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET)
+    let decoded;
+    try{
+        decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    }
+    catch(err){
+        throw new ApiError(401,"Invalid refresh token")
+    }
 
     const user = await UserRepository.findUserByIdWithRefreshToken(decoded.id);
 
@@ -285,6 +342,7 @@ module.exports = {
     verifyEmail,
     resendOTP,
     forgotPassword,
+    verifyResetOtp,
     resetPassword,
     login,
     logout,

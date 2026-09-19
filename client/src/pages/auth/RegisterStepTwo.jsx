@@ -1,14 +1,14 @@
 import StepIndicator from "./StepIndicator";
 import Button from "../../components/common/Button";
 import Input from "../../components/common/Input";
-import { useNavigate } from "react-router-dom";
-import Loader from "../../components/ui/Loader";
 import { AnimatePresence, motion } from "framer-motion";
+import { AlertCircle } from "lucide-react";
 
 function RegisterStepTwo({
     stepTwoData,
     setStepTwoData,
     prevStep,
+    nextStep,
     stepOneData,
     errors,
     setErrors,
@@ -19,19 +19,17 @@ function RegisterStepTwo({
     register
 }) {
 
-    const navigate = useNavigate();
-
     const handleChange = (e) => {
         setStepTwoData(prev => ({
             ...prev,
-            [e.target.name]: e.target.value,
+            [e.target.name]: e.target.value
         }));
 
         if (errors[e.target.name]) {
             setErrors(prev => ({
                 ...prev,
-                [e.target.name]: "",
-            }))
+                [e.target.name]: ""
+            }));
         }
 
         if (apiError) {
@@ -42,23 +40,29 @@ function RegisterStepTwo({
     const validate = () => {
         const newErrors = {};
 
+        const companyRegex = /^[a-zA-Z0-9\s.&-]+$/;
+        const designationRegex = /^[a-zA-Z0-9\s.&-]+$/;
+
         if (!stepTwoData.company.trim()) {
-            newErrors.company = "Company name is required";
+            newErrors.company = "Company is required";
         } else if (stepTwoData.company.trim().length < 2) {
-            newErrors.company = "Company name must be at least 2 characters";
+            newErrors.company = "Company must be at least 2 characters long";
         } else if (stepTwoData.company.trim().length > 100) {
-            newErrors.company = "Company name cannot exceed 100 characters";
-        }
-        else if (!/^[a-zA-Z0-9\s.&-]+$/.test(stepTwoData.company.trim())) {
-            newErrors.company = "Company name can only contain letters, numbers, spaces, dots, ampersands and hyphens.";
+            newErrors.company = "Company must be at most 100 characters long";
+        } else if (!companyRegex.test(stepTwoData.company)) {
+            newErrors.company =
+                "Company can only contain letters, numbers, spaces, dots, ampersands and hyphens";
         }
 
         if (!stepTwoData.designation.trim()) {
             newErrors.designation = "Designation is required";
         } else if (stepTwoData.designation.trim().length < 2) {
-            newErrors.designation = "Designation must be at least 2 characters";
+            newErrors.designation = "Designation must be at least 2 characters long";
         } else if (stepTwoData.designation.trim().length > 100) {
-            newErrors.designation = "Designation cannot exceed 100 characters";
+            newErrors.designation = "Designation must be at most 100 characters long";
+        } else if (!designationRegex.test(stepTwoData.designation)) {
+            newErrors.designation =
+                "Designation can only contain letters, numbers, spaces, dots, ampersands and hyphens";
         }
 
         setErrors(newErrors);
@@ -84,9 +88,12 @@ function RegisterStepTwo({
                 designation: stepTwoData.designation
             }
 
-            await register(payload)
+            await register(payload);
 
-            navigate("/dashboard", { replace: true });
+            // Advance to Step 3 (Verify Email OTP)
+            if (nextStep) {
+                nextStep();
+            }
 
         } catch (err) {
 
@@ -112,7 +119,7 @@ function RegisterStepTwo({
 
     return (
         <>
-            <StepIndicator step={2} />
+            <StepIndicator step={2} totalSteps={3} />
 
             <h1 className="text-4xl font-semibold text-white">
                 Tell us about your company
@@ -129,11 +136,10 @@ function RegisterStepTwo({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={{ duration: 0.2 }}
-                        className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3"
+                        className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 flex items-center gap-2 text-sm font-medium text-red-400"
                     >
-                        <p className="text-sm font-medium text-red-400">
-                            {apiError}
-                        </p>
+                        <AlertCircle size={16} className="shrink-0" />
+                        <span>{apiError}</span>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -175,8 +181,10 @@ function RegisterStepTwo({
                     onClick={handleSubmit}
                     className="flex-1"
                     disabled={isSubmitting}
+                    loading={isSubmitting}
+                    loadingText="Creating Account..."
                 >
-                    {isSubmitting ? <Loader /> : "Create Account"}
+                    Create Account
                 </Button>
 
             </div>

@@ -6,6 +6,7 @@ import { useAuth } from "../../hooks/useAuth";
 import AuthLayout from "./AuthLayout";
 import RegisterStepOne from "./RegisterStepOne";
 import RegisterStepTwo from "./RegisterStepTwo";
+import RegisterStepThree from "./RegisterStepThree";
 
 const variants = {
     initial: (direction) => ({
@@ -55,23 +56,23 @@ function Register() {
     const [direction, setDirection] = useState(1);
 
     useEffect(() => {
-    if (!apiError) return;
+        if (!apiError) return;
 
-    const timer = setTimeout(() => {
-        setApiError(null);
-    }, 2500);
+        const timer = setTimeout(() => {
+            setApiError(null);
+        }, 3000);
 
-    return () => clearTimeout(timer);
-}, [apiError]);
+        return () => clearTimeout(timer);
+    }, [apiError]);
 
     function nextStep() {
         setDirection(1);
-        setStep(2);
+        setStep((prev) => Math.min(3, prev + 1));
     }
 
     function prevStep() {
         setDirection(-1);
-        setStep(1);
+        setStep((prev) => Math.max(1, prev - 1));
     }
 
     return (
@@ -98,11 +99,12 @@ function Register() {
                                 apiError={apiError}
                                 setApiError={setApiError}
                             />
-                        ) : (
+                        ) : step === 2 ? (
                             <RegisterStepTwo
                                 stepTwoData={stepTwoData}
                                 setStepTwoData={setStepTwoData}
                                 prevStep={prevStep}
+                                nextStep={nextStep}
                                 stepOneData={stepOneData}
                                 errors={errors}
                                 setErrors={setErrors}
@@ -111,6 +113,15 @@ function Register() {
                                 isSubmitting={isSubmitting}
                                 setIsSubmitting={setIsSubmitting}
                                 register={register}
+                            />
+                        ) : (
+                            <RegisterStepThree
+                                email={stepOneData.email}
+                                prevStep={prevStep}
+                                errors={errors}
+                                setErrors={setErrors}
+                                apiError={apiError}
+                                setApiError={setApiError}
                             />
                         )}
 

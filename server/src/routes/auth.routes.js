@@ -29,6 +29,13 @@ router.post("/verify-email", publicLimiter, validate(verifyEmailSchema), authCon
 router.post("/forgot-password", publicLimiter, validate(forgotPasswordSchema), authController.forgotPassword);
 
 /**
+ * @route POST /api/v1/auth/verify-reset-otp
+ * @description Verify OTP before resetting password
+ * @access Public
+ */
+router.post("/verify-reset-otp", publicLimiter, validate(verifyEmailSchema), authController.verifyResetOtp);
+
+/**
  * @route POST /api/v1/auth/reset-password
  * @description Reset password using OTP
  * @access Public

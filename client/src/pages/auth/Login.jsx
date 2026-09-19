@@ -1,8 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircle2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import Loader from "../../components/ui/Loader"
 
 import AuthLayout from "./AuthLayout";
 import Input from "../../components/common/Input";
@@ -32,11 +32,22 @@ const variants = {
 };
 
 function Login() {
+    const [searchParams] = useSearchParams();
+    const [successMessage, setSuccessMessage] = useState(() => {
+        if (searchParams.get("verified") === "true") {
+            return "Email verified successfully! You can now log in.";
+        }
+        if (searchParams.get("reset") === "true") {
+            return "Password reset successfully! Log in with your new password.";
+        }
+        return null;
+    });
 
     const [loginData, setLoginData] = useState({
         email: "",
         password: "",
     });
+    const [showPassword, setShowPassword] = useState(false);
 
     const navigate = useNavigate();
 
@@ -51,10 +62,20 @@ function Login() {
 
         const timer = setTimeout(() => {
             setApiError(null);
-        }, 2500);
+        }, 3000);
 
         return () => clearTimeout(timer);
     }, [apiError]);
+
+    useEffect(() => {
+        if (!successMessage) return;
+
+        const timer = setTimeout(() => {
+            setSuccessMessage(null);
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [successMessage]);
 
     const handleChange = (e) => {
         setLoginData(prev => ({
@@ -72,6 +93,10 @@ function Login() {
         if (apiError) {
             setApiError(null);
         }
+
+        if (successMessage) {
+            setSuccessMessage(null);
+        }
     };
 
     const validate = () => {
@@ -79,24 +104,12 @@ function Login() {
 
         if (!loginData.email.trim()) {
             newErrors.email = "Email is required";
-        } else if (
-            !/^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+.-]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9-]*\.)+[A-Za-z]{2,}$/
-                .test(loginData.email)
-        ) {
-            newErrors.email = "Please enter a valid email address";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.email)) {
+            newErrors.email = "Enter a valid email address";
         }
+
         if (!loginData.password) {
             newErrors.password = "Password is required";
-        } else if (loginData.password.length < 8) {
-            newErrors.password = "Password must be at least 8 characters";
-        } else if (!/[A-Z]/.test(loginData.password)) {
-            newErrors.password = "Password must contain at least one uppercase letter";
-        } else if (!/[a-z]/.test(loginData.password)) {
-            newErrors.password = "Password must contain at least one lowercase letter";
-        } else if (!/[0-9]/.test(loginData.password)) {
-            newErrors.password = "Password must contain at least one number";
-        } else if (!/[!@#$%^&*]/.test(loginData.password)) {
-            newErrors.password = "Password must contain at least one special character";
         }
 
         setErrors(newErrors);
@@ -112,6 +125,7 @@ function Login() {
 
         try {
             setApiError(null);
+            setSuccessMessage(null);
             setIsSubmitting(true);
 
             await login(loginData);
@@ -120,11 +134,14 @@ function Login() {
         }
         catch (err) {
             const status = err.response?.status;
+            setSuccessMessage(null);
 
             if (status === 429) {
-                setApiError("Too many login requests. Please try again later.")
+                setApiError("Too many login requests. Please try again later.");
+            } else if (status === 403) {
+                setApiError("Your account is not verified. Please register or check your email for the verification code.");
             } else {
-                setApiError(err.response?.data?.message || "Something went wrong. Please try again later");
+                setApiError(err.response?.data?.message || "Invalid credentials.");
             }
             console.error(err);
         }
@@ -155,6 +172,22 @@ function Login() {
                         Sign in to continue managing your recruitment pipeline.
                     </p>
 
+                    {/* Verified/Reset Notification Banner */}
+                    <AnimatePresence>
+                        {successMessage && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -8 }}
+                                transition={{ duration: 0.2 }}
+                                className="mt-6 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-300"
+                            >
+                                <CheckCircle2 size={16} className="shrink-0 text-emerald-400" />
+                                <span>{successMessage}</span>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     <AnimatePresence>
                         {apiError && (
                             <motion.div
@@ -162,16 +195,15 @@ function Login() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -8 }}
                                 transition={{ duration: 0.2 }}
-                                className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3"
+                                className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 flex items-center gap-2 text-sm font-medium text-red-400"
                             >
-                                <p className="text-sm font-medium text-red-400">
-                                    {apiError}
-                                </p>
+                                <AlertCircle size={16} className="shrink-0" />
+                                <span>{apiError}</span>
                             </motion.div>
                         )}
                     </AnimatePresence>
 
-                    <div className="mt-10 space-y-5">
+                    <div className="mt-8 space-y-5">
 
                         <Input
                             type="email"
@@ -183,20 +215,47 @@ function Login() {
                             label="Email"
                         />
 
-                        <Input
-                            type="password"
-                            name="password"
-                            value={loginData.password}
-                            onChange={handleChange}
-                            placeholder="Enter your password"
-                            error={errors.password}
-                            label="Password"
-                        />
+                        <div>
+                            <Input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                value={loginData.password}
+                                onChange={handleChange}
+                                placeholder="Enter your password"
+                                error={errors.password}
+                                label="Password"
+                                endElement={
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                        className="text-zinc-400 hover:text-white transition-colors cursor-pointer p-1"
+                                        tabIndex={-1}
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                }
+                            />
+                            <div className="mt-2 text-right">
+                                <Link
+                                    to="/forgot-password"
+                                    className="text-xs font-medium text-zinc-400 hover:text-white transition"
+                                >
+                                    Forgot password?
+                                </Link>
+                            </div>
+                        </div>
 
                     </div>
 
-                    <Button className="mt-8 w-full" onClick={handleLogin} disabled={isSubmitting}>
-                        {isSubmitting ? <Loader /> : "Sign In"}
+                    <Button
+                        className="mt-8 w-full"
+                        onClick={handleLogin}
+                        disabled={isSubmitting}
+                        loading={isSubmitting}
+                        loadingText="Signing In..."
+                    >
+                        Sign In
                     </Button>
 
                     <p className="mt-8 text-center text-zinc-400">

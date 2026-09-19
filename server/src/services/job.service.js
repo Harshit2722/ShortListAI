@@ -66,6 +66,27 @@ const updateJob = async (jobId,jobData,recruiterId) => {
     return updatedJob
 }
 
+const updateJobStatus = async (jobId,status,recruiterId) => {
+
+    const job = await JobRepository.findJobById(jobId);
+
+    if(!job){
+        throw new ApiError(404,"Job not found")
+    }
+
+    if(job.createdBy.toString()!==recruiterId.toString()){
+        throw new ApiError(403,"You can only update your own jobs")
+    }
+
+    const updatedJob = await JobRepository.updateJob(jobId,{"status":status});
+
+    if(!updatedJob){
+        throw new ApiError(500,"Failed to update job status")
+    }
+
+    return updatedJob;
+}
+
 const getJobById = async (jobId,recruiterId) => {
 
     const job = await JobRepository.findJobById(jobId);
@@ -81,15 +102,45 @@ const getJobById = async (jobId,recruiterId) => {
     return job;
 }
 
-const getAllJobsOfARecruiter = async (recruiterId,filters)=>{
+const getAllJobsOfARecruiter = async (recruiterId,query)=>{
 
-    const query = {
-        ...filters,
-        createdBy: recruiterId
-    }
-    const jobs = await JobRepository.getAllJobs(query);
+    const {
+        page,
+        limit,
+        sort,
+        order,
+        search,
+        status,
+        workMode,
+        employmentType
+    } = query;
 
-    return jobs;
+    const allowedSortFields = {
+        createdAt: "createdAt",
+        applicationDeadline: "applicationDeadline",
+        title: "title",
+        salaryMin: "salary.min",
+        salaryMax: "salary.max",
+        experience: "experience"
+    };
+
+    const sortField = allowedSortFields[sort] || "createdAt";
+
+    const sortOrder = order==="asc" ? 1 : -1;
+
+    const {jobs,total} = await JobRepository.getAllJobs(recruiterId,page,limit,sortField,sortOrder,status,search,employmentType,workMode);
+
+    const totalPages = Math.ceil(total/limit);
+
+    return {
+        jobs,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages
+        }
+    };
     
 }
 
@@ -105,13 +156,12 @@ const deleteJob = async (jobId,recruiterId) =>{
         throw new ApiError(403,"You can only delete your own jobs")
     }
 
-    const resumes = await ResumeRepository.getResumesByJob(jobId);
+    const resumes = await ResumeRepository.findResumesByJobIds([jobId]);
     let deletedJob;
 
     try{
         await ResumeRepository.deleteResumesByJob(jobId);
         deletedJob = await JobRepository.deleteJob(jobId);
-
     }
     catch(error){
         console.error("Failed to delete job",error.message);
@@ -136,6 +186,7 @@ const deleteJob = async (jobId,recruiterId) =>{
 module.exports = {
     createJob,
     updateJob,
+    updateJobStatus,
     getJobById,
     getAllJobsOfARecruiter,
     deleteJob
