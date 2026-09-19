@@ -12,6 +12,7 @@ import Jobs from "../pages/dashboard/Jobs";
 import JobDetails from "../pages/dashboard/JobDetails";
 import JobCandidates from "../pages/dashboard/JobCandidates";
 import CandidateDetails from "../pages/dashboard/CandidateDetails";
+import Settings from "../pages/dashboard/Settings";
 
 function AppRoutes(){
     return (
@@ -24,6 +25,7 @@ function AppRoutes(){
             <Route path="/forgot-password" element={<PublicRoute><ForgotPassword/></PublicRoute>} />
 
             <Route path="/dashboard" element={<ProtectedRoute><RecruiterLayout><Dashboard/></RecruiterLayout></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><RecruiterLayout><Settings/></RecruiterLayout></ProtectedRoute>} />
 
             <Route path="/jobs" element={<ProtectedRoute><RecruiterLayout><Jobs/></RecruiterLayout></ProtectedRoute>} />
             <Route path="/jobs/:jobId" element={<ProtectedRoute><RecruiterLayout><JobDetails/></RecruiterLayout></ProtectedRoute>} />

@@ -1,10 +1,9 @@
-
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, Settings } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import Logo from "./Logo";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 
 const navItems = [
     {
@@ -77,10 +76,16 @@ const RecruiterNavbar = () => {
                             className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 pr-3 backdrop-blur-md transition duration-200 hover:border-white/25 hover:bg-white/[0.08] cursor-pointer"
                             aria-expanded={isProfileOpen}
                         >
-                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-800 text-sm font-semibold text-white shadow-inner">
-                                {user?.name
-                                    ? user.name.charAt(0).toUpperCase()
-                                    : "R"}
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden bg-gradient-to-br from-zinc-700 to-zinc-800 text-sm font-semibold text-white shadow-inner border border-white/10">
+                                {user?.avatar?.url ? (
+                                    <img
+                                        src={user.avatar.url}
+                                        alt={user?.name || "User"}
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    user?.name ? user.name.charAt(0).toUpperCase() : "R"
+                                )}
                             </div>
 
                             <span className="hidden text-xs font-medium text-zinc-200 sm:inline-block max-w-[120px] truncate">
@@ -104,10 +109,16 @@ const RecruiterNavbar = () => {
                                     className="absolute right-0 mt-2.5 w-64 origin-top-right rounded-2xl border border-white/15 bg-zinc-950/90 p-4 shadow-2xl backdrop-blur-2xl z-50"
                                 >
                                     <div className="flex items-center gap-3 pb-3">
-                                        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-zinc-700 to-zinc-900 border border-white/10 text-base font-semibold text-white shadow-inner">
-                                            {user?.name
-                                                ? user.name.charAt(0).toUpperCase()
-                                                : "R"}
+                                        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl overflow-hidden bg-gradient-to-br from-zinc-700 to-zinc-900 border border-white/10 text-base font-semibold text-white shadow-inner">
+                                            {user?.avatar?.url ? (
+                                                <img
+                                                    src={user.avatar.url}
+                                                    alt={user?.name || "User"}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                user?.name ? user.name.charAt(0).toUpperCase() : "R"
+                                            )}
                                         </div>
 
                                         <div className="flex flex-col min-w-0">
@@ -124,16 +135,27 @@ const RecruiterNavbar = () => {
 
                                     <div className="my-2 border-t border-white/10" />
 
-                                    <button
-                                        onClick={() => {
-                                            setIsProfileOpen(false);
-                                            logout();
-                                        }}
-                                        className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-red-400 transition duration-150 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
-                                    >
-                                        <LogOut size={15} />
-                                        <span>Sign Out</span>
-                                    </button>
+                                    <div className="space-y-1">
+                                        <Link
+                                            to="/settings"
+                                            onClick={() => setIsProfileOpen(false)}
+                                            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-zinc-300 transition duration-150 hover:bg-white/[0.06] hover:text-white cursor-pointer"
+                                        >
+                                            <Settings size={15} />
+                                            <span>Account Settings</span>
+                                        </Link>
+
+                                        <button
+                                            onClick={() => {
+                                                setIsProfileOpen(false);
+                                                logout();
+                                            }}
+                                            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-red-400 transition duration-150 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
+                                        >
+                                            <LogOut size={15} />
+                                            <span>Sign Out</span>
+                                        </button>
+                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>

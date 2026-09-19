@@ -109,7 +109,7 @@ const passwordLimiter = rateLimit({
 
 const deleteAccountLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 2,
+    max: 4,
 
     keyGenerator: (req) => {
         return req.user._id.toString()
