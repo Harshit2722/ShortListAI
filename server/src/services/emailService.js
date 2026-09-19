@@ -275,50 +275,86 @@ const generateEmailChangeVerificationHTML = (otp, name, newEmail) => {
 `;
 };
 
+const dispatchMail = async ({ to, subject, html }) => {
+    // 1. If BREVO_API_KEY is present (recommended: works on Render free tier, no custom domain needed)
+    if (process.env.BREVO_API_KEY) {
+        try {
+            const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.MAIL_USER || "harshitpushkarnais@gmail.com";
+            const recipients = Array.isArray(to) ? to.map(e => ({ email: e })) : [{ email: to }];
+
+            const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+                method: "POST",
+                headers: {
+                    "accept": "application/json",
+                    "api-key": process.env.BREVO_API_KEY,
+                    "content-type": "application/json"
+                },
+                body: JSON.stringify({
+                    sender: {
+                        name: "Shortlist AI",
+                        email: senderEmail
+                    },
+                    to: recipients,
+                    subject,
+                    htmlContent: html
+                })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                console.error("Brevo API error:", errData);
+                throw new Error(errData.message || `Brevo API returned status ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (err) {
+            console.error("Error sending email via Brevo:", err);
+            throw err;
+        }
+    }
+
+    // 2. Fallback to Nodemailer SMTP (local development if BREVO_API_KEY is not set)
+    const mailOptions = {
+        from: process.env.MAIL_FROM || '"Shortlist AI" <no-reply@shortlistai.com>',
+        to,
+        subject,
+        html,
+    };
+    return await transporter.sendMail(mailOptions);
+};
+
 class EmailService {
 
     async sendEmailVerificationOTP(email, otp, name) {
-        const mailOptions = {
-            from: process.env.MAIL_FROM || '"Shortlist AI" <no-reply@shortlistai.com>',
+        await dispatchMail({
             to: email,
             subject: "Verify your email - Shortlist AI",
-            html: generateVerificationEmailHTML(otp,name)
-        };
-
-        await transporter.sendMail(mailOptions);
+            html: generateVerificationEmailHTML(otp, name),
+        });
     }
 
     async sendForgotPasswordOTP(email, otp) {
-        const mailOptions = {
-            from: process.env.MAIL_FROM || '"Shortlist AI" <no-reply@shortlistai.com>',
+        await dispatchMail({
             to: email,
             subject: "Reset your password - Shortlist AI",
-            html: generateForgotPasswordEmailHTML(otp)
-        };
-
-        await transporter.sendMail(mailOptions);
+            html: generateForgotPasswordEmailHTML(otp),
+        });
     }
 
     async sendWelcomeEmail(email, name) {
-        const mailOptions = {
-            from: process.env.MAIL_FROM || '"Shortlist AI" <no-reply@shortlistai.com>',
+        await dispatchMail({
             to: email,
             subject: "Welcome to Shortlist AI!",
-            html: generateWelcomeEmailHTML(name)
-        };
-
-        await transporter.sendMail(mailOptions);
+            html: generateWelcomeEmailHTML(name),
+        });
     }
 
-    async sendEmailChangeVerificationOTP(otp,name,newEmail){
-      const mailOptions = {
-        from: process.env.MAIL_FROM || '"Shortlist AI" <no-reply@shortlistai.com>',
-        to: newEmail,
-        subject: "Confirm Your New Email Address - Shortlist AI",
-        html: generateEmailChangeVerificationHTML(otp,name,newEmail)
-      };
-
-      await transporter.sendMail(mailOptions);
+    async sendEmailChangeVerificationOTP(otp, name, newEmail) {
+        await dispatchMail({
+            to: newEmail,
+            subject: "Confirm Your New Email Address - Shortlist AI",
+            html: generateEmailChangeVerificationHTML(otp, name, newEmail),
+        });
     }
 }
 

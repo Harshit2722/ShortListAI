@@ -45,6 +45,7 @@ const register = async ({ name, email, password, company, designation }) => {
         };
     }
     catch (err) {
+        console.error("Register sendEmailVerificationOTP error:", err);
         await UserRepository.deleteUser(user._id);
         throw new ApiError(500, "Failed to send verification email")
     }
@@ -123,6 +124,7 @@ const resendOTP = async ({email}) => {
         };
     }
     catch (err) {
+        console.error("Resend sendEmailVerificationOTP error:", err);
         await UserRepository.updateUser(user._id,{
             "verification.emailOTP": null,
             "verification.emailOTPExpiry": null,
@@ -155,6 +157,7 @@ const forgotPassword = async ({email}) => {
         }
     }
     catch (err){
+        console.error("sendForgotPasswordOTP error:", err);
         await UserRepository.updateUser(user._id,{
             "verification.forgotPasswordOTP": null,
             "verification.forgotPasswordOTPExpiry": null,
