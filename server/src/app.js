@@ -24,13 +24,20 @@ app.use(morgan("dev"));
 
 app.use(express.json());
 
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
-app.use("/api/v1/auth",authRoutes);
-app.use("/api/v1/jobs",jobRoutes);
-app.use("/api/v1/users",userRoutes);
+app.get("/", (req, res) => {
+    return res.status(200).json({
+        success: true,
+        message: "ShortList AI Backend is live!"
+    })
+})
+
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/jobs", jobRoutes);
+app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 
 app.use(errorMiddleware);
