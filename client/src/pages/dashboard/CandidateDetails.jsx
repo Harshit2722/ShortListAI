@@ -241,7 +241,7 @@ const CandidateDetails = () => {
                                                 {analysis.recommendation}
                                             </Badge>
                                         )}
-                                        {candidate.status && (
+                                        {candidate.status && candidate.status !== "Completed" && (
                                             <Badge variant={getStatusVariant(candidate.status)}>
                                                 {candidate.status}
                                             </Badge>
@@ -431,7 +431,7 @@ const CandidateDetails = () => {
                                         ))}
                                     </ul>
                                 ) : (
-                                    <p className="text-xs text-zinc-500 italic">No structured work history parsed.</p>
+                                    <p className="text-xs text-zinc-500 italic">No work experience found (fresher/student)</p>
                                 )}
                             </Card>
                         </motion.div>
@@ -479,14 +479,6 @@ const CandidateDetails = () => {
                                     out of 10
                                 </span>
                             </div>
-
-                            {analysis.recommendation && (
-                                <div className="mt-2">
-                                    <Badge variant={getRecommendationVariant(analysis.recommendation)}>
-                                        {analysis.recommendation}
-                                    </Badge>
-                                </div>
-                            )}
                         </Card>
                     </motion.div>
 
