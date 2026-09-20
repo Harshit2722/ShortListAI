@@ -45,8 +45,11 @@ const validateResponse = (response) => {
         let cleanResponse = response;
         if (typeof cleanResponse === "string") {
             cleanResponse = cleanResponse.trim();
-            // Strip markdown code blocks if model returned ```json ... ```
-            if (cleanResponse.startsWith("```")) {
+            // Extract JSON from markdown code block if wrapped (with or without preamble)
+            const codeBlockMatch = cleanResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+            if (codeBlockMatch) {
+                cleanResponse = codeBlockMatch[1].trim();
+            } else if (cleanResponse.startsWith("```")) {
                 cleanResponse = cleanResponse.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
             }
         }

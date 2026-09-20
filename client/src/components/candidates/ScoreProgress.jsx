@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 
 const getColorClasses = (score) => {
+    // 7.0 - 10.0: Green (Strong / Excellent)
     if (score >= 7) {
         return {
             text: "text-emerald-400",
@@ -8,13 +9,15 @@ const getColorClasses = (score) => {
             glow: "shadow-[0_0_12px_rgba(52,211,153,0.3)]"
         };
     }
-    if (score >= 5) {
+    // 4.0 - 6.9: Amber (Average / Moderate)
+    if (score >= 4) {
         return {
             text: "text-amber-400",
             bg: "bg-amber-500",
             glow: "shadow-[0_0_12px_rgba(251,191,36,0.3)]"
         };
     }
+    // 0.0 - 3.9: Red (Poor / Weak)
     return {
         text: "text-rose-400",
         bg: "bg-rose-500",
@@ -40,7 +43,8 @@ const ScoreProgress = ({ label, score = 0, max = 10, icon: Icon }) => {
                 </span>
             </div>
 
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06] p-0.5">
+            {/* Track remains clearly visible with high contrast border even when score is 0.0 */}
+            <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800/90 border border-white/10 p-[1px]">
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${percentage}%` }}

@@ -2,6 +2,10 @@
 
 > AI-powered Recruitment Assistant built with React 19, Node.js, Express, MongoDB, Cloudinary, and Groq LLM.
 
+[![Deployed App](https://img.shields.io/badge/Deployed%20App-Live-brightgreen.svg)](https://short-list-ai.vercel.app)
+
+
+
 Shortlist AI is an AI-powered recruitment assistant that streamlines candidate sourcing, hiring pipelines, and resume evaluation. Recruiters can post jobs, upload resumes with automated duplicate detection (SHA-256 fingerprinting), analyze candidate resumes using Groq's high-speed LLM inference, and monitor pipeline metrics through a centralized real-time dashboard.
 
 ---
@@ -77,7 +81,7 @@ Store Candidate Analysis in MongoDB
 | **Frontend** | React 19, Vite, React Router v7, Tailwind CSS v4, Framer Motion, Axios, Lucide React, Three.js, React Three Fiber |
 | **Backend** | Node.js, Express.js 5 |
 | **Database** | MongoDB Atlas, Mongoose 9 |
-| **AI / LLM** | Groq SDK (`openai/gpt-oss-20b`, or custom via `AI_MODEL`) |
+| **AI / LLM** | Groq SDK (`openai/gpt-oss-20b` or custom via `AI_MODEL`) |
 | **Email Service** | Brevo HTTPS REST API (Production) / Nodemailer SMTP (Local fallback) |
 | **Authentication** | JWT (Access & Refresh tokens), bcryptjs, HTTP-only Cookies |
 | **Validation** | Zod |
