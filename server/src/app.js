@@ -37,6 +37,13 @@ app.get("/", (req, res) => {
     })
 })
 
+// Unauthenticated health check for Render zero-downtime and cold-start warming
+app.get("/health", (req, res) => {
+    return res.status(200).json({
+        status: "ok"
+    });
+});
+
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/jobs", jobRoutes);
 app.use("/api/v1/users", userRoutes);
