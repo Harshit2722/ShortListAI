@@ -157,10 +157,12 @@ const analyzeResume = async (resumeId,jobId,recruiterId) => {
     await ResumeSubmissionRepository.updateResume(resumeId,{status: "Processing"});
 
     const seniority = determineSeniority(job.title,job.experience);
-    
-    try{
+    try {
+        // Token guard: Truncate raw resume text to 12,000 characters (~3,000 tokens) to prevent context window overflow
+        const sanitizedResumeText = (resume.resumeText || "").slice(0, 12000);
+
         const analysis = await analyzeResumeWithAI({
-            resumeText: resume.resumeText,
+            resumeText: sanitizedResumeText,
             jobDescription: job.description,
             jobTitle: job.title,
             requiredSkills: job.requiredSkills,

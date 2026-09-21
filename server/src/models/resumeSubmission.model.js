@@ -38,6 +38,31 @@ const resumeSchema = new mongoose.Schema({
                 type: String,
                 trim: true
             }]
+        },
+        projects: {
+            type: [{
+                name: {
+                    type: String,
+                    trim: true
+                },
+                techStack: {
+                    type: [{
+                        type: String,
+                        trim: true
+                    }],
+                    default: []
+                },
+                summary: {
+                    type: String,
+                    trim: true
+                },
+                link: {
+                    type: String,
+                    trim: true,
+                    default: null
+                }
+            }],
+            default: []
         }
     },
     resume: {
@@ -120,6 +145,33 @@ const resumeSchema = new mongoose.Schema({
                 trim: true
             }],
             default: []
+        },
+        scoreReasons: {
+            skills: {
+                type: String,
+                trim: true,
+                default: ""
+            },
+            experience: {
+                type: String,
+                trim: true,
+                default: ""
+            },
+            projects: {
+                type: String,
+                trim: true,
+                default: ""
+            },
+            education: {
+                type: String,
+                trim: true,
+                default: ""
+            },
+            resume: {
+                type: String,
+                trim: true,
+                default: ""
+            }
         }
     }
 },{timestamps:true})

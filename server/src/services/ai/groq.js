@@ -20,42 +20,50 @@ const getModel = () => {
 
 const generateCompletion = async (prompt) => {
     const model = getModel();
+    const maxRetries = 1;
 
-    try {
-        const client = getGroqClient();
-        const completion = await client.chat.completions.create({
-            model: model,
-            temperature: 0.1,
-            response_format: { type: "json_object" },
-            messages: [
-                {
-                    role: "system",
-                    content: "You are an expert technical recruiter evaluating resumes against job descriptions. Always respond with a valid JSON object strictly containing 'candidate' and 'analysis' top-level objects."
-                },
-                {
-                    role: "user",
-                    content: prompt
-                }
-            ]
-        });
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            const client = getGroqClient();
+            const completion = await client.chat.completions.create({
+                model: model,
+                temperature: 0.1,
+                response_format: { type: "json_object" },
+                messages: [
+                    {
+                        role: "system",
+                        content: "You are an expert technical recruiter evaluating resumes against job descriptions. Always respond with a valid JSON object strictly containing 'candidate' and 'analysis' top-level objects."
+                    },
+                    {
+                        role: "user",
+                        content: prompt
+                    }
+                ]
+            });
 
-        let content = completion.choices[0]?.message?.content;
-        if (!content) {
-            throw new Error("Empty response received from Groq API");
-        }
-
-        // Some LLMs occasionally wrap json mode output in code blocks; clean before returning
-        if (typeof content === "string") {
-            content = content.trim();
-            if (content.startsWith("```")) {
-                content = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+            let content = completion.choices[0]?.message?.content;
+            if (!content) {
+                throw new Error("Empty response received from Groq API");
             }
-        }
 
-        return content;
-    } catch (error) {
-        console.error("Groq Completion Error:", error.message || error);
-        throw new ApiError(500, "Failed to generate AI response");
+            // Some LLMs occasionally wrap json mode output in code blocks; clean before returning
+            if (typeof content === "string") {
+                content = content.trim();
+                if (content.startsWith("```")) {
+                    content = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+                }
+            }
+
+            return content;
+        } catch (error) {
+            console.error(`Groq Completion Error (Attempt ${attempt + 1}/${maxRetries + 1}):`, error.message || error);
+            if (attempt < maxRetries) {
+                // Short 500ms pause before retry
+                await new Promise((res) => setTimeout(res, 500));
+                continue;
+            }
+            throw new ApiError(500, "Failed to generate AI response");
+        }
     }
 };
 

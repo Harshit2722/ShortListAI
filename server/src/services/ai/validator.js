@@ -15,6 +15,45 @@ const scoreSchema = z.preprocess((val) => {
     return Math.max(0, Math.min(10, Math.round(num)));
 }, z.number().int().min(0).max(10).default(5));
 
+// Safe project item schema
+const projectItemSchema = z.object({
+    name: z.preprocess(
+        (val) => (typeof val === "string" && val.trim() ? val.trim() : "Project"),
+        z.string().default("Project")
+    ),
+    techStack: stringArraySchema,
+    summary: z.preprocess(
+        (val) => (typeof val === "string" && val.trim() ? val.trim() : ""),
+        z.string().default("")
+    ),
+    link: z.preprocess(
+        (val) => (typeof val === "string" && val.trim() ? val.trim() : null),
+        z.string().nullable().optional().default(null)
+    )
+});
+
+// Safe projects array schema
+const projectsArraySchema = z.preprocess((val) => {
+    if (Array.isArray(val)) {
+        return val.filter(item => item && typeof item === "object");
+    }
+    return [];
+}, z.array(projectItemSchema).default([]));
+
+// Safe score reasons schema
+const reasonStringSchema = z.preprocess(
+    (val) => (typeof val === "string" && val.trim() ? val.trim() : ""),
+    z.string().default("")
+);
+
+const scoreReasonsSchema = z.object({
+    skills: reasonStringSchema,
+    experience: reasonStringSchema,
+    projects: reasonStringSchema,
+    education: reasonStringSchema,
+    resume: reasonStringSchema
+}).default({});
+
 const resumeAnalysisSchema = z.object({
     candidate: z.object({
         name: z.string().nullable().optional().default(null),
@@ -22,7 +61,8 @@ const resumeAnalysisSchema = z.object({
         phone: z.string().nullable().optional().default(null),
         skills: stringArraySchema,
         education: stringArraySchema,
-        experience: stringArraySchema
+        experience: stringArraySchema,
+        projects: projectsArraySchema
     }).default({}),
     analysis: z.object({
         skillsScore: scoreSchema,
@@ -30,6 +70,7 @@ const resumeAnalysisSchema = z.object({
         educationScore: scoreSchema,
         resumeScore: scoreSchema,
         projectsScore: scoreSchema,
+        scoreReasons: scoreReasonsSchema,
         summary: z.preprocess(
             (val) => (typeof val === "string" && val.trim() ? val : "Candidate evaluation completed."),
             z.string().default("Candidate evaluation completed.")
@@ -92,6 +133,7 @@ const validateResponse = (response) => {
                 educationScore: parsed.educationScore,
                 resumeScore: parsed.resumeScore,
                 projectsScore: parsed.projectsScore,
+                scoreReasons: parsed.scoreReasons || parsed.score_reasons || parsed.reasons,
                 summary: parsed.summary,
                 strengths: parsed.strengths,
                 weaknesses: parsed.weaknesses,
@@ -103,8 +145,18 @@ const validateResponse = (response) => {
             parsed.candidate = {};
         }
 
+        // If projects were placed at root level
+        if (!parsed.candidate.projects && parsed.projects) {
+            parsed.candidate.projects = parsed.projects;
+        }
+
         if (!parsed.analysis || typeof parsed.analysis !== "object") {
             parsed.analysis = {};
+        }
+
+        // If scoreReasons were placed at root level
+        if (!parsed.analysis.scoreReasons && (parsed.scoreReasons || parsed.score_reasons || parsed.reasons)) {
+            parsed.analysis.scoreReasons = parsed.scoreReasons || parsed.score_reasons || parsed.reasons;
         }
 
         return resumeAnalysisSchema.parse(parsed);
