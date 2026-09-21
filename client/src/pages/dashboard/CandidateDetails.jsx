@@ -410,6 +410,73 @@ const CandidateDetails = () => {
                         </Card>
                     </motion.div>
 
+                    {/* Featured Projects Card */}
+                    <motion.div variants={fadeUp} initial="hidden" animate="visible">
+                        <Card className="p-6 sm:p-7 space-y-4">
+                            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                                <div className="flex items-center gap-2 text-zinc-300">
+                                    <FolderGit2 size={16} className="text-primary-400" />
+                                    <h3 className="text-xs font-semibold uppercase tracking-wider text-white">
+                                        Featured Projects ({candidateInfo.projects?.length || 0})
+                                    </h3>
+                                </div>
+                                <span className="text-[11px] text-zinc-500">Extracted from Resume</span>
+                            </div>
+
+                            {candidateInfo.projects?.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                                    {candidateInfo.projects.map((proj, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] p-4 flex flex-col justify-between transition-all duration-200 space-y-3"
+                                        >
+                                            <div className="space-y-1.5">
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <h4 className="text-sm font-semibold text-white tracking-tight">
+                                                        {proj.name || `Project ${idx + 1}`}
+                                                    </h4>
+                                                    {proj.link && (
+                                                        <a
+                                                            href={proj.link.startsWith("http") ? proj.link : `https://${proj.link}`}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="text-zinc-400 hover:text-primary-400 transition-colors p-1 -m-1"
+                                                            title="View project link"
+                                                        >
+                                                            <ExternalLink size={13} />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                                {proj.summary && (
+                                                    <p className="text-xs text-zinc-300 leading-relaxed line-clamp-3">
+                                                        {proj.summary}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            {proj.techStack?.length > 0 && (
+                                                <div className="flex flex-wrap gap-1.5 pt-1">
+                                                    {proj.techStack.map((tech, tIdx) => (
+                                                        <span
+                                                            key={tIdx}
+                                                            className="rounded-lg border border-white/10 bg-white/[0.05] px-2 py-0.5 text-[10px] font-medium text-zinc-300"
+                                                        >
+                                                            {tech}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="py-4 text-center">
+                                    <p className="text-xs text-zinc-500 italic">No structured projects detected on resume.</p>
+                                </div>
+                            )}
+                        </Card>
+                    </motion.div>
+
                     {/* Experience & Education */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Extracted Experience */}
@@ -493,26 +560,31 @@ const CandidateDetails = () => {
                                 <ScoreProgress
                                     label="Skills Match"
                                     score={analysis.skillsScore}
+                                    reason={analysis.scoreReasons?.skills}
                                     icon={Award}
                                 />
                                 <ScoreProgress
                                     label="Experience Relevance"
                                     score={analysis.experienceScore}
+                                    reason={analysis.scoreReasons?.experience}
                                     icon={Briefcase}
                                 />
                                 <ScoreProgress
                                     label="Projects Quality"
                                     score={analysis.projectsScore}
+                                    reason={analysis.scoreReasons?.projects}
                                     icon={FolderGit2}
                                 />
                                 <ScoreProgress
                                     label="Education Background"
                                     score={analysis.educationScore}
+                                    reason={analysis.scoreReasons?.education}
                                     icon={GraduationCap}
                                 />
                                 <ScoreProgress
                                     label="Resume Presentation"
                                     score={analysis.resumeScore}
+                                    reason={analysis.scoreReasons?.resume}
                                     icon={FileText}
                                 />
                             </div>

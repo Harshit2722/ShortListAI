@@ -13,6 +13,7 @@ import {
     Calendar,
     AlertCircle,
     ArrowRight,
+    ChevronRight,
 } from "lucide-react";
 
 import { getDashboard } from "../../api/dashboard.api";
@@ -212,13 +213,14 @@ const Dashboard = () => {
                                             {dashboard.recentJobs && dashboard.recentJobs.length > 0 ? (
                                                 <div className="space-y-3.5">
                                                     {dashboard.recentJobs.map((job) => (
-                                                        <div
+                                                        <Link
                                                             key={job._id}
-                                                            className="group/item flex flex-col justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/[0.05] sm:flex-row sm:items-center"
+                                                            to={`/jobs/${job._id}`}
+                                                            className="group/item flex flex-col justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/[0.05] sm:flex-row sm:items-center cursor-pointer"
                                                         >
                                                             <div className="space-y-1.5">
                                                                 <div className="flex items-center gap-2.5">
-                                                                    <h3 className="font-semibold text-white group-hover/item:text-zinc-100">
+                                                                    <h3 className="font-semibold text-white group-hover/item:text-zinc-100 transition-colors">
                                                                         {job.title}
                                                                     </h3>
                                                                     <Badge variant={job.status === "Open" ? "success" : "neutral"}>
@@ -251,14 +253,15 @@ const Dashboard = () => {
                                                                 </div>
                                                             </div>
 
-                                                            <div className="flex items-center justify-between sm:justify-end gap-3">
-                                                                <span className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-300">
+                                                            <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                                                                <span className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-300 group-hover/item:border-white/20 transition-colors">
                                                                     <Users size={13} className="text-zinc-400" />
                                                                     <span>{job.candidateCount ?? 0}</span>
                                                                     <span className="text-zinc-500">applicants</span>
                                                                 </span>
+                                                                <ChevronRight size={16} className="text-zinc-500 transition-transform duration-200 group-hover/item:translate-x-0.5 group-hover/item:text-zinc-300" />
                                                             </div>
-                                                        </div>
+                                                        </Link>
                                                     ))}
                                                 </div>
                                             ) : (
@@ -302,20 +305,23 @@ const Dashboard = () => {
                                                     {dashboard.topCandidates.map((cand, idx) => {
                                                         const candidateName = cand.candidate?.name || cand.candidate?.email || `Candidate #${idx + 1}`;
                                                         const jobTitle = cand.job?.title || "Role Evaluation";
+                                                        const jobId = cand.job?._id || cand.job;
                                                         const score = cand.analysis?.overallScore ?? 0;
                                                         const recommendation = cand.analysis?.recommendation;
+                                                        const candidateLink = jobId ? `/jobs/${jobId}/candidates/${cand._id}` : "#";
 
                                                         return (
-                                                            <div
+                                                            <Link
                                                                 key={cand._id || idx}
-                                                                className="group/item flex flex-col justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/[0.05] sm:flex-row sm:items-center"
+                                                                to={candidateLink}
+                                                                className="group/item flex flex-col justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/[0.05] sm:flex-row sm:items-center cursor-pointer"
                                                             >
-                                                                <div className="flex items-center gap-3.5">
-                                                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-sm font-semibold text-white shadow-inner">
+                                                                <div className="flex items-center gap-3.5 min-w-0">
+                                                                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-sm font-semibold text-white shadow-inner group-hover/item:border-white/20 transition-colors">
                                                                         {candidateName.charAt(0).toUpperCase()}
                                                                     </div>
-                                                                    <div className="space-y-0.5">
-                                                                        <h3 className="font-semibold text-white group-hover/item:text-zinc-100">
+                                                                    <div className="space-y-0.5 min-w-0">
+                                                                        <h3 className="font-semibold text-white group-hover/item:text-zinc-100 transition-colors truncate">
                                                                             {candidateName}
                                                                         </h3>
                                                                         <div className="flex items-center gap-2 text-xs text-zinc-400">
@@ -332,13 +338,14 @@ const Dashboard = () => {
                                                                     </div>
                                                                 </div>
 
-                                                                <div className="flex items-center gap-2.5">
+                                                                <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                                                                     <div className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold ${getScoreColor(score)}`}>
                                                                         <span>{score.toFixed(1)}</span>
                                                                         <span className="text-[10px] opacity-70">/ 10</span>
                                                                     </div>
+                                                                    <ChevronRight size={16} className="text-zinc-500 transition-transform duration-200 group-hover/item:translate-x-0.5 group-hover/item:text-zinc-300" />
                                                                 </div>
-                                                            </div>
+                                                            </Link>
                                                         );
                                                     })}
                                                 </div>
