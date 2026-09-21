@@ -68,6 +68,28 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
         - If a field is unavailable, return null.
 
         ========================
+        SKILL ALIAS & SYNONYM RULES
+        ========================
+
+        Treat equivalent technical terms, framework naming conventions, and abbreviations as identical skills.
+        Never penalize candidates for alias variations:
+        - "Node", "Node.js", "NodeJS", "Node js" are identical.
+        - "React", "React.js", "ReactJS", "React js" are identical.
+        - "Next", "Next.js", "NextJS", "Next js" are identical.
+        - "Vue", "Vue.js", "VueJS", "Vue js" are identical.
+        - "Express", "Express.js", "ExpressJS", "Express js" are identical.
+        - "Mongo", "MongoDB" are identical.
+        - "Postgres", "PostgreSQL" are identical.
+        - "JS", "JavaScript" are identical.
+        - "TS", "TypeScript" are identical.
+        - "AWS", "Amazon Web Services" are identical.
+        - "GCP", "Google Cloud Platform" are identical.
+        - "K8s", "Kubernetes" are identical.
+        - "Docker", "Containerization" match closely.
+        - Match case-insensitively (e.g., "golang" = "Go", "python" = "Python").
+        - If a candidate lists an alias of a required skill, count it as a full match.
+
+        ========================
         SKILLS EVALUATION RULES
         ========================
 
@@ -103,14 +125,19 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
         5. Professional work experience should always be valued more than personal projects.
 
         ========================
-        PROJECT EVALUATION RULES
+        PROJECT EXTRACTION & EVALUATION RULES
         ========================
 
-        1. Evaluate project complexity.
-        2. Evaluate technical depth.
-        3. Evaluate relevance to the job role.
-        4. Deployed applications, freelance work, hackathons, startup work, and open-source contributions should receive higher scores than tutorial projects.
-        5. Personal projects may compensate for limited experience but should not fully replace professional experience.
+        1. Extract up to 4 significant candidate projects into the "projects" array.
+        2. For each project, extract:
+           - "name": Concise project name.
+           - "techStack": Array of technologies used (e.g. ["React", "Node.js", "MongoDB"]).
+           - "summary": 1-2 sentence description of what was built and candidate's contribution.
+           - "link": GitHub/live URL if present, or null if not found.
+        3. If no distinct projects are found on the resume, return an empty array [].
+        4. Evaluate project complexity, technical depth, and relevance to the job role.
+        5. Deployed applications, freelance work, hackathons, startup work, and open-source contributions should receive higher scores than tutorial projects.
+        6. Personal projects may compensate for limited experience but should not fully replace professional experience.
 
         ========================
         EDUCATION EVALUATION RULES
@@ -131,6 +158,21 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
         3. Reward measurable achievements.
         4. Minor grammatical mistakes should have minimal impact.
         5. Poor formatting or missing important information should reduce the resume quality score.
+
+        ========================
+        SCORE EXPLAINABILITY RULES (scoreReasons)
+        ========================
+
+        Recruiters need to know EXACTLY what kept the candidate from receiving a 10/10 in each dimension.
+        Do NOT just state what the candidate did well. Explicitly explain what is missing, incomplete, or what gap prevented a perfect 10/10 score.
+        If a score is already 10/10, state what made it exceptional.
+
+        Provide a concise 1-2 sentence plain-English explanation for each dimension:
+        - "skills": State why this score was given and what specific missing required skill(s) or depth gap prevented a 10/10 (e.g., "Scored 7/10: Proficient in Node.js and React, but lacks required experience with Docker and PostgreSQL, which held it back from 10/10").
+        - "experience": State what experience duration or industry relevance gap kept it from a 10/10 (e.g., "Scored 6/10: Has 1.5 years of experience against the 3 years required for this role").
+        - "projects": State what complexity, architecture, deployment, or metric gap kept projects from a 10/10 (e.g., "Scored 8/10: Demonstrates good full-stack functionality, but projects lack live production URLs, CI/CD pipelines, or scale metrics").
+        - "education": State what degree, accreditation, or certification gap kept it from a 10/10 (e.g., "Scored 8/10: Has a relevant degree, but lacks industry-recognized certifications requested for senior infrastructure").
+        - "resume": State what formatting, impact metrics, or structural gap kept it from a 10/10 (e.g., "Scored 8/10: Well-organized structure, but lacks measurable business impact metrics in bullet points").
 
         ========================
         MISSING SKILLS RULES
@@ -173,7 +215,15 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
             "phone": "string | null",
             "skills": ["string"],
             "education": ["string"],
-            "experience": ["string"]
+            "experience": ["string"],
+            "projects": [
+                {
+                    "name": "string",
+                    "techStack": ["string"],
+                    "summary": "string",
+                    "link": "string | null"
+                }
+            ]
         },
         "analysis": {
             "skillsScore": 0,
@@ -181,15 +231,22 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
             "projectsScore": 0,
             "educationScore": 0,
             "resumeScore": 0,
+            "scoreReasons": {
+                "skills": "Explain why this score was awarded and what specific missing skill or gap kept it from being a 10/10.",
+                "experience": "Explain what gap in years or role relevance kept this experience score below 10/10.",
+                "projects": "Explain what project complexity, deployment, or architecture gap kept this score below 10/10.",
+                "education": "Explain what degree, accreditation, or certification gap kept this score below 10/10.",
+                "resume": "Explain what formatting, metric, or clarity gap kept this resume score below 10/10."
+            },
             "summary": "Provide a concise 2-4 sentence summary explaining why the candidate received the evaluation, highlighting major strengths and gaps.",
             "strengths": [
-            "string"
+                "string"
             ],
             "weaknesses": [
-            "string"
+                "string"
             ],
             "missingSkills": [
-            "string"
+                "string"
             ]
         }
         }
