@@ -32,7 +32,18 @@ const createResume = async (jobId,recruiterId,resumeFile) => {
     const existingResume = await ResumeSubmissionRepository.findResumeWithHash(jobId,hash);
 
     if(existingResume){
-        throw new ApiError(409,"This resume is already uploaded for this job")
+        if(existingResume.status === "Completed"){
+            throw new ApiError(409,"This resume is already uploaded for this job");
+        }
+        if(existingResume.status === "Processing"){
+            throw new ApiError(409,"Resume analysis is already in progress");
+        }
+        // If status is "Failed" or "Pending", recover and reuse the existing upload record
+        if(existingResume.status === "Failed"){
+            await ResumeSubmissionRepository.updateResume(existingResume._id,{status: "Pending"});
+            existingResume.status = "Pending";
+        }
+        return existingResume;
     }
     
     const resumeText = await extractTextFromPDF(buffer);
