@@ -28,11 +28,12 @@ const generateCompletion = async (prompt) => {
             const completion = await client.chat.completions.create({
                 model: model,
                 temperature: 0.1,
+                max_tokens: 4096,
                 response_format: { type: "json_object" },
                 messages: [
                     {
                         role: "system",
-                        content: "You are an expert technical recruiter evaluating resumes against job descriptions. Always respond with a valid JSON object strictly containing 'candidate' and 'analysis' top-level objects."
+                        content: "You are an expert recruiter evaluating resumes against job descriptions across technical, business, creative, and operational domains. Always respond with a valid JSON object strictly containing both 'candidate' and 'analysis' top-level objects with all detailed scores and explanations."
                     },
                     {
                         role: "user",

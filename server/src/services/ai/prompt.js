@@ -2,7 +2,7 @@
 const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredSkills,requiredExperience,seniority}) => {
 
     const prompt = `
-        You are an experienced technical recruiter responsible for evaluating software engineering candidates.
+        You are an experienced professional recruiter responsible for evaluating candidates across technical, creative, operational, and business domains against the provided job description.
 
         Your task is to analyze the candidate's resume against the provided job description and return a structured evaluation.
 
@@ -45,19 +45,19 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
         Evaluate the candidate according to the expectations of this seniority level.
 
         Intern
-        - Focus primarily on technical skills, projects, internships, certifications, and learning potential.
+        - Focus primarily on relevant role skills, practical projects, internships, coursework/certifications, and learning potential.
 
         Junior
-        - Professional experience is beneficial but strong personal projects, internships, and technical ability may compensate.
+        - Professional experience is beneficial but strong personal or academic projects, internships, and relevant domain skills may compensate.
 
         Mid-Level
-        - Expect relevant professional experience together with solid technical skills and the ability to work independently.
+        - Expect relevant professional experience together with solid domain skills and the ability to work independently.
 
         Senior
-        - Expect strong professional experience, system design knowledge, ownership, problem-solving ability, mentoring, and technical leadership.
+        - Expect strong professional experience, domain mastery, ownership, problem-solving ability, mentoring, and technical or functional leadership.
 
         Staff / Principal
-        - Expect significant technical leadership, large-scale system design, cross-team collaboration, architecture ownership, and extensive production experience.
+        - Expect significant leadership, large-scale strategic impact, cross-functional collaboration, strategy or architecture ownership, and extensive industry experience.
 
         ========================
         CANDIDATE EXTRACTION RULES
@@ -136,7 +136,7 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
            - "link": GitHub/live URL if present, or null if not found.
         3. If no distinct projects are found on the resume, return an empty array [].
         4. Evaluate project complexity, technical depth, and relevance to the job role.
-        5. Deployed applications, freelance work, hackathons, startup work, and open-source contributions should receive higher scores than tutorial projects.
+        5. Live campaigns, deployed applications, published work, portfolio pieces, client/freelance work, hackathons, startup work, and open-source contributions should receive higher scores than basic tutorial projects.
         6. Personal projects may compensate for limited experience but should not fully replace professional experience.
 
         ========================
@@ -144,7 +144,7 @@ const buildResumeAnalysisPrompt = ({resumeText,jobDescription,jobTitle,requiredS
         ========================
 
         1. Evaluate relevant degrees and certifications.
-        2. Practical technical ability should be valued more than college reputation.
+        2. Practical domain and functional capability should be valued more than college reputation.
         3. Do NOT heavily penalize candidates from lesser-known colleges.
         4. Relevant certifications should positively influence the education score.
         5. Extract the complete education details exactly as mentioned in the resume, including the degree, institution, location, dates or duration, and any other relevant information. Do not omit or summarize any education entries.
