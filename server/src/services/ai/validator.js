@@ -92,6 +92,12 @@ const validateResponse = (response) => {
                 cleanResponse = codeBlockMatch[1].trim();
             } else if (cleanResponse.startsWith("```")) {
                 cleanResponse = cleanResponse.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+            } else {
+                const firstBrace = cleanResponse.indexOf("{");
+                const lastBrace = cleanResponse.lastIndexOf("}");
+                if (firstBrace !== -1 && lastBrace > firstBrace) {
+                    cleanResponse = cleanResponse.slice(firstBrace, lastBrace + 1);
+                }
             }
         }
 
@@ -99,12 +105,13 @@ const validateResponse = (response) => {
 
         // Unwrap outer wrapper if LLM returned { data: ... }, { result: ... }, or { response: ... }
         if (parsed && typeof parsed === "object") {
-            if (parsed.data && typeof parsed.data === "object" && (parsed.data.analysis || parsed.data.candidate)) {
-                parsed = parsed.data;
-            } else if (parsed.result && typeof parsed.result === "object" && (parsed.result.analysis || parsed.result.candidate)) {
-                parsed = parsed.result;
-            } else if (parsed.response && typeof parsed.response === "object" && (parsed.response.analysis || parsed.response.candidate)) {
-                parsed = parsed.response;
+            const possibleWrappers = ["data", "result", "response", "output", "payload"];
+            for (const wrapperKey of possibleWrappers) {
+                const inner = parsed[wrapperKey];
+                if (inner && typeof inner === "object" && (inner.analysis || inner.Analysis || inner.candidate || inner.Candidate)) {
+                    parsed = inner;
+                    break;
+                }
             }
         }
 
@@ -112,54 +119,173 @@ const validateResponse = (response) => {
             parsed = {};
         }
 
-        // If analysis is under an alternate key
-        if (!parsed.analysis || typeof parsed.analysis !== "object") {
-            parsed.analysis = 
-                parsed.evaluation || 
-                parsed.assessment || 
-                parsed.scores || 
-                parsed.candidateAnalysis || 
-                parsed.candidate_analysis || 
-                parsed.review || 
-                parsed.analysis_result || 
-                null;
-        }
-
-        // If analysis fields were flattened at the root level
-        if (!parsed.analysis && (parsed.skillsScore !== undefined || parsed.summary !== undefined || parsed.strengths !== undefined)) {
-            parsed.analysis = {
-                skillsScore: parsed.skillsScore,
-                experienceScore: parsed.experienceScore,
-                educationScore: parsed.educationScore,
-                resumeScore: parsed.resumeScore,
-                projectsScore: parsed.projectsScore,
-                scoreReasons: parsed.scoreReasons || parsed.score_reasons || parsed.reasons,
-                summary: parsed.summary,
-                strengths: parsed.strengths,
-                weaknesses: parsed.weaknesses,
-                missingSkills: parsed.missingSkills
-            };
-        }
-
+        // Resolve candidate object
         if (!parsed.candidate || typeof parsed.candidate !== "object") {
+            parsed.candidate = 
+                parsed.Candidate || 
+                parsed.candidateProfile || 
+                parsed.candidate_profile || 
+                parsed.applicant || 
+                parsed.profile || 
+                {};
+        }
+        if (typeof parsed.candidate !== "object" || parsed.candidate === null) {
             parsed.candidate = {};
         }
 
-        // If projects were placed at root level
-        if (!parsed.candidate.projects && parsed.projects) {
-            parsed.candidate.projects = parsed.projects;
+        // If candidate contains nested analysis/evaluation
+        if (!parsed.analysis && parsed.candidate && typeof parsed.candidate === "object") {
+            if (parsed.candidate.analysis && typeof parsed.candidate.analysis === "object") {
+                parsed.analysis = parsed.candidate.analysis;
+                delete parsed.candidate.analysis;
+            } else if (parsed.candidate.evaluation && typeof parsed.candidate.evaluation === "object") {
+                parsed.analysis = parsed.candidate.evaluation;
+                delete parsed.candidate.evaluation;
+            } else if (parsed.candidate.scores && typeof parsed.candidate.scores === "object") {
+                parsed.analysis = parsed.candidate.scores;
+                delete parsed.candidate.scores;
+            }
         }
+
+        // If analysis is under an alternate key
+        if (!parsed.analysis || typeof parsed.analysis !== "object") {
+            parsed.analysis = 
+                parsed.Analysis || 
+                parsed.evaluation || 
+                parsed.Evaluation || 
+                parsed.assessment || 
+                parsed.Assessment || 
+                parsed.scores || 
+                parsed.Scores || 
+                parsed.scoring || 
+                parsed.Scoring || 
+                parsed.candidateAnalysis || 
+                parsed.candidate_analysis || 
+                parsed.CandidateAnalysis || 
+                parsed.review || 
+                parsed.Review || 
+                parsed.analysis_result || 
+                parsed.analysisResult || 
+                parsed.ratings || 
+                parsed.Ratings || 
+                parsed.jobFit || 
+                parsed.fitAnalysis || 
+                null;
+        }
+
+        // If analysis was returned as stringified JSON
+        if (typeof parsed.analysis === "string") {
+            try {
+                const parsedInner = JSON.parse(parsed.analysis);
+                if (parsedInner && typeof parsedInner === "object") {
+                    parsed.analysis = parsedInner;
+                }
+            } catch (_) {}
+        }
+
+        // If analysis fields were flattened at the root level
+        if (!parsed.analysis || typeof parsed.analysis !== "object") {
+            const hasFlattenedScores = 
+                parsed.skillsScore !== undefined || 
+                parsed.skills_score !== undefined || 
+                parsed.summary !== undefined || 
+                parsed.strengths !== undefined;
+            if (hasFlattenedScores) {
+                parsed.analysis = {
+                    skillsScore: parsed.skillsScore ?? parsed.skills_score,
+                    experienceScore: parsed.experienceScore ?? parsed.experience_score,
+                    educationScore: parsed.educationScore ?? parsed.education_score,
+                    resumeScore: parsed.resumeScore ?? parsed.resume_score,
+                    projectsScore: parsed.projectsScore ?? parsed.projects_score,
+                    scoreReasons: parsed.scoreReasons || parsed.score_reasons || parsed.reasons,
+                    summary: parsed.summary,
+                    strengths: parsed.strengths,
+                    weaknesses: parsed.weaknesses,
+                    missingSkills: parsed.missingSkills ?? parsed.missing_skills
+                };
+            }
+        }
+
+        // If projects were placed at root level
+        if (!parsed.candidate.projects && (parsed.projects || parsed.Projects)) {
+            parsed.candidate.projects = parsed.projects || parsed.Projects;
+        }
+
+        // Normalize internal analysis field names
+        if (parsed.analysis && typeof parsed.analysis === "object") {
+            if (parsed.analysis.skillsScore === undefined) {
+                parsed.analysis.skillsScore = parsed.analysis.skills_score ?? (typeof parsed.analysis.skills === "number" ? parsed.analysis.skills : undefined);
+            }
+            if (parsed.analysis.experienceScore === undefined) {
+                parsed.analysis.experienceScore = parsed.analysis.experience_score ?? (typeof parsed.analysis.experience === "number" ? parsed.analysis.experience : undefined);
+            }
+            if (parsed.analysis.projectsScore === undefined) {
+                parsed.analysis.projectsScore = parsed.analysis.projects_score ?? (typeof parsed.analysis.projects === "number" ? parsed.analysis.projects : undefined);
+            }
+            if (parsed.analysis.educationScore === undefined) {
+                parsed.analysis.educationScore = parsed.analysis.education_score ?? (typeof parsed.analysis.education === "number" ? parsed.analysis.education : undefined);
+            }
+            if (parsed.analysis.resumeScore === undefined) {
+                parsed.analysis.resumeScore = parsed.analysis.resume_score ?? (typeof parsed.analysis.resume === "number" ? parsed.analysis.resume : undefined);
+            }
+
+            if (!parsed.analysis.summary) {
+                parsed.analysis.summary = parsed.analysis.Summary || parsed.analysis.executiveSummary || parsed.analysis.executive_summary || parsed.analysis.overview || parsed.analysis.verdict;
+            }
+
+            if (!parsed.analysis.strengths) {
+                parsed.analysis.strengths = parsed.analysis.Strengths || parsed.analysis.keyStrengths || parsed.analysis.key_strengths || parsed.analysis.pros;
+            }
+
+            if (!parsed.analysis.weaknesses) {
+                parsed.analysis.weaknesses = parsed.analysis.Weaknesses || parsed.analysis.areasForImprovement || parsed.analysis.areas_for_improvement || parsed.analysis.areasOfImprovement || parsed.analysis.gaps || parsed.analysis.cons;
+            }
+
+            if (!parsed.analysis.missingSkills) {
+                parsed.analysis.missingSkills = parsed.analysis.missing_skills || parsed.analysis.MissingSkills;
+            }
+
+            if (!parsed.analysis.scoreReasons) {
+                parsed.analysis.scoreReasons = parsed.analysis.score_reasons || parsed.analysis.reasons || parsed.analysis.score_explanation || parsed.analysis.scoreExplanations;
+            }
+        }
+
+        // If scoreReasons were placed at root level
+        if (parsed.analysis && typeof parsed.analysis === "object" && !parsed.analysis.scoreReasons) {
+            if (parsed.scoreReasons || parsed.score_reasons || parsed.reasons) {
+                parsed.analysis.scoreReasons = parsed.scoreReasons || parsed.score_reasons || parsed.reasons;
+            }
+        }
+
+        // Check if any genuine analysis was provided by LLM before defaults take over
+        const hasScores = Boolean(
+            parsed.analysis && typeof parsed.analysis === "object" && (
+                parsed.analysis.skillsScore !== undefined ||
+                parsed.analysis.experienceScore !== undefined ||
+                parsed.analysis.projectsScore !== undefined ||
+                parsed.analysis.educationScore !== undefined ||
+                parsed.analysis.resumeScore !== undefined
+            )
+        );
+        const hasSummary = Boolean(
+            parsed.analysis && typeof parsed.analysis === "object" &&
+            typeof parsed.analysis.summary === "string" &&
+            parsed.analysis.summary.trim() &&
+            parsed.analysis.summary.trim() !== "Candidate evaluation completed."
+        );
+
+        const analysisWasDefaulted = !hasScores && !hasSummary;
 
         if (!parsed.analysis || typeof parsed.analysis !== "object") {
             parsed.analysis = {};
         }
 
-        // If scoreReasons were placed at root level
-        if (!parsed.analysis.scoreReasons && (parsed.scoreReasons || parsed.score_reasons || parsed.reasons)) {
-            parsed.analysis.scoreReasons = parsed.scoreReasons || parsed.score_reasons || parsed.reasons;
-        }
+        const validated = resumeAnalysisSchema.parse(parsed);
 
-        return resumeAnalysisSchema.parse(parsed);
+        return {
+            ...validated,
+            analysisWasDefaulted
+        };
     } catch (error) {
         console.error("AI Response Validation Error:", error);
         console.error("Raw AI Response Content:", response);
